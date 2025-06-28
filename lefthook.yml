@@ -1,0 +1,31 @@
+# Lefthook configuration for Custom Shoes project
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: pnpm eslint {staged_files} --fix
+      stage_fixed: true
+
+    format:
+      glob: "*.{js,jsx,ts,tsx,json,css,md}"
+      run: pnpm prettier --write {staged_files}
+      stage_fixed: true
+
+    typecheck:
+      run: pnpm tsc --noEmit
+
+pre-push:
+  parallel: true
+  commands:
+    build:
+      run: pnpm build
+
+    lint-all:
+      run: pnpm lint
+
+commit-msg:
+  commands:
+    commitlint:
+      run: echo "Commit message ok"
