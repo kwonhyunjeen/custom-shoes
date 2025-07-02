@@ -1,8 +1,12 @@
+import { AppLayout } from "./components/layout/AppLayout";
+import { Header } from "./components/layout/Header";
+
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      Let's go customizing your shoes!
-    </div>
+    <>
+      <Header shoeModel="3045MSAP022" price={125} />
+      <AppLayout />
+    </>
   );
 }
 
