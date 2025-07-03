@@ -1,5 +1,7 @@
 // import { useState } from "react";
 
+import { Scene3D } from "../3d/Scene3D";
+
 export const AppLayout: React.FC = () => {
   // const [selectedPart, setSelectedPart] = useState("laces");
 
@@ -16,8 +18,7 @@ export const AppLayout: React.FC = () => {
 
       {/* 중앙: 3D 신발 모델 */}
       <div className="relative">
-        {/* <Scene3D /> */}
-        <div>Scene3D</div>
+        <Scene3D />
       </div>
 
       {/* 오른쪽: 세부 커스터마이징 패널 */}
