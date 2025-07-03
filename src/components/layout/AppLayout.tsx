@@ -1,10 +1,6 @@
-// import { useState } from "react";
-
-import { Scene3D } from "../3d/Scene3D";
+import { Scene3D } from "@components/3d/Scene3D";
 
 export const AppLayout: React.FC = () => {
-  // const [selectedPart, setSelectedPart] = useState("laces");
-
   return (
     <main className="grid grid-cols-3 h-[calc(100vh-120px)]">
       {/* 왼쪽: 특성 설명 & 커스터마이징 옵션 */}

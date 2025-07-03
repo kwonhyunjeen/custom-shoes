@@ -1,5 +1,5 @@
-import { AppLayout } from "./components/layout/AppLayout";
-import { Header } from "./components/layout/Header";
+import { Header } from "@/components/layout/Header";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 function App() {
   return (
