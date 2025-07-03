@@ -5,7 +5,7 @@ import * as THREE from "three";
 
 export const Shoes: React.FC = () => {
   const { raycaster } = useThree();
-  const gltf = useLoader(GLTFLoader, "/models/custom.gltf");
+  const gltf = useLoader(GLTFLoader, "/models/custom.glb");
 
   const shoesClick = () => {
     const intersects = raycaster.intersectObjects(gltf.scene.children, true);
