@@ -1,15 +1,12 @@
-import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
-import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { useLoader } from "@react-three/fiber";
 
 export const Shoes: React.FC = () => {
-  const obj = useLoader(OBJLoader, "./models/custom.obj");
-  const fbx = useLoader(FBXLoader, "./models/custom.fbx");
+  const gltf = useLoader(GLTFLoader, "/models/custom.gltf");
 
   return (
     <mesh>
-      <primitive object={obj} />
-      <primitive object={fbx} />
+      <primitive object={gltf.scene} />
     </mesh>
   );
 };
