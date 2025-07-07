@@ -1,104 +1,109 @@
-# Custom Shoes - 3D 신발 커스터마이징 웹사이트
+# Custom Shoes - 3D Shoe Customization Web App
 
-실시간 3D 모델링을 통해 사용자가 신발을 커스터마이징할 수 있는 인터랙티브 웹 애플리케이션입니다.
+An interactive web application that allows users to customize 3D shoe models in real-time. Built with modern web technologies to provide high-quality 3D visualization and responsive user interface, inspired by services like Nike By You.
 
-👉🏻 [Custom Shoes Project 개발 블로그](https://kwonhyunjin.super.site/learnings)
+👉🏻 [Custom Shoes Project Dev Blog](https://kwonhyunjin.super.site/learnings)
 
-## 🚀 기능
+## 🚀 Project Overview
 
-- **3D 신발 모델 시각화**: Three.js와 React Three Fiber를 사용한 실시간 3D 렌더링
-- **인터랙티브 커스터마이징**: 색상, 재질, 패턴 등을 실시간으로 변경
-- **프리셋 구성**: 미리 정의된 스타일 조합으로 빠른 커스터마이징
-- **반응형 디자인**: 데스크톱과 모바일 모두 지원
-- **모던 UI/UX**: Tailwind CSS를 활용한 세련된 인터페이스
+This project aims to create an intuitive shoe customization experience where users can:
 
-## 🛠 기술 스택
+- Rotate and view 3D shoe models in the browser
+- Click on different parts to change colors
+- Customize shoes according to their preferences
+- Experience smooth, real-time 3D interactions
 
-- **Frontend**: React 19, TypeScript
-- **3D Graphics**: Three.js, React Three Fiber (@react-three/fiber), React Three Drei (@react-three/drei)
-- **Styling**: Tailwind CSS
-- **Development**: Vite, Leva (디버깅용 컨트롤)
-- **Build**: ES2020, 모던 브라우저 대상
+**Current Goal:** Building a foundation for 3D web development skills while creating an engaging user experience.
 
-## 📦 설치 및 실행
+**Future Vision:** Implementing AI-powered natural language processing for commands like "Paint the laces with a summer vibe color!"
 
-### 사전 요구사항
+## 🛠 Tech Stack
 
-- Node.js 20.19.0 이상
-- pnpm (권장) 또는 npm
+**Core Technologies**
 
-### 설치
+- Frontend: React 19 + TypeScript
+- 3D Graphics: Three.js + React Three Fiber + React Three Drei
+- Build Tool: Vite
+- Styling: Tailwind CSS v4
+- Development: Leva (for debugging controls)
+
+**Development Tools**
+
+- Linting: ESLint + Prettier
+- Git Hooks: Lefthook
+- Package Manager: pnpm
+
+## 🎯 Getting Started
+
+**Prerequisites**
+
+- Node.js 20+
+- pnpm (recommended) or npm
+
+**Installation**
 
 ```bash
-# 레포지토리 클론
-git clone https://github.com/your-username/custom-shoes.git
+# Clone the repository
+git clone https://github.com/kwonhyunjeen/custom-shoes.git
 cd custom-shoes
 
-# 의존성 설치
+# Install dependencies
 pnpm install
-```
 
-### 개발 서버 실행
-
-```bash
+# Start development server
 pnpm run dev
 ```
 
-개발 서버가 실행되면 `http://localhost:5173`에서 애플리케이션을 확인할 수 있습니다.
+The application will be available at http://localhost:5173
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**Available Scripts**
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```bash
+pnpm run dev          # Start development server
+pnpm run build        # Build for production
+pnpm run preview      # Preview production build
+pnpm run lint         # Run ESLint
+pnpm run format       # Format code with Prettier
+pnpm run typecheck    # Type checking
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛣 Roadmap
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
+**Short-term (Phase 1)**
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+- [ ] Enhanced camera controls
+
+- [ ] Turntable animation effects
+
+- [ ] Improved lighting setup
+
+- [ ] Color picker UI component
+
+- [ ] Part-specific color management
+
+**Long-term (Phase 2)**
+
+- [ ] AI-powered natural language commands
+
+- [ ] Intelligent color recommendations
+
+- [ ] Advanced material and texture options
+
+- [ ] WebGL shaders and visual effects
+
+- [ ] Multi-device optimization
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+**🙏 Acknowledgments**
+
+- Nike By You for design inspiration
+- TurboSquid for 3D shoe models
+- React Three Fiber community for excellent documentation
+- Three.js ecosystem for powerful 3D capabilities
+
+---
+
+This project serves as a learning journey into 3D web development and modern React patterns. Follow along as we build something amazing! 🚀
