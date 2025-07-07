@@ -2,6 +2,8 @@
 
 실시간 3D 모델링을 통해 사용자가 신발을 커스터마이징할 수 있는 인터랙티브 웹 애플리케이션입니다.
 
+👉🏻 [Custom Shoes Project 개발 블로그](https://kwonhyunjin.super.site/learnings)
+
 ## 🚀 기능
 
 - **3D 신발 모델 시각화**: Three.js와 React Three Fiber를 사용한 실시간 3D 렌더링
