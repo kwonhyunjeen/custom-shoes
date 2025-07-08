@@ -12,7 +12,7 @@ export const Shoes: React.FC = () => {
 
   const gltf = useLoader(GLTFLoader, "/models/custom.glb");
 
-  const shoesClick = (event: ThreeEvent<MouseEvent>) => {
+  const shoesClick = async (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
 
     const intersects = raycaster.intersectObjects(gltf.scene.children, true);
@@ -23,6 +23,12 @@ export const Shoes: React.FC = () => {
       const cloneMaterial = material.clone();
       mesh.material = cloneMaterial;
       cloneMaterial.color = new THREE.Color("blue");
+
+      try {
+        await cameraControlsRef.current.fitToBox(mesh, true);
+      } catch (error) {
+        console.error("카메라 이동 중 오류 발생:", error);
+      }
     }
   };
 
@@ -33,7 +39,7 @@ export const Shoes: React.FC = () => {
         enabled={true}
         dollyToCursor={true}
         minDistance={0.5}
-        maxDistance={10}
+        // maxDistance={10}
       />
       <directionalLight position={[3, 3, 3]} />
       <primitive object={gltf.scene} onClick={shoesClick} />
