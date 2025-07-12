@@ -26,7 +26,7 @@ export const TurnTable = ({
   });
 
   return (
-    <group position={[0, -0.2, 0]}>
+    <group position={[0, -0.15, 0]}>
       <mesh ref={meshRef}>
         <cylinderGeometry args={[radius, radius, height, 64]} />
         <meshPhysicalMaterial
