@@ -2,25 +2,29 @@ import { Scene3D } from "@components/3d/Scene3D";
 
 export const AppLayout: React.FC = () => {
   return (
-    <main className="grid grid-cols-3 h-[calc(100vh-120px)]">
-      {/* 왼쪽: 특성 설명 & 커스터마이징 옵션 */}
-      <div className="p-8 border-r border-gray-200 overflow-y-auto">
-        {/* <CustomizationOptions
-          selectedPart={selectedPart}
-          onPartChange={setSelectedPart}
-        /> */}
-        <div>CustomizationOptions</div>
+    <main className="flex h-screen bg-gradient-to-r from-stone-600 via-stone-300 to-stone-600">
+      <div className="w-1/3 flex flex-col justify-center p-4 border-r border-stone-400/20">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-gray-200/50 h-fit">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Select Part
+          </h2>
+          <p className="text-sm text-gray-500">Choose shoe part to customize</p>
+        </div>
       </div>
 
-      {/* 중앙: 3D 신발 모델 */}
-      <div className="relative">
+      <div className="w-3/5 relative">
         <Scene3D />
       </div>
 
-      {/* 오른쪽: 세부 커스터마이징 패널 */}
-      <div className="p-8 border-l border-gray-200 overflow-y-auto">
-        {/* <CustomizationPanel selectedPart={selectedPart} /> */}
-        <div>CustomizationPanel</div>
+      <div className="w-2/5 flex flex-col justify-center p-4 border-l border-stone-400/20">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-gray-200/50 h-fit">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Select Color
+          </h2>
+          <p className="text-sm text-gray-500">
+            Choose shoe color to customize
+          </p>
+        </div>
       </div>
     </main>
   );
