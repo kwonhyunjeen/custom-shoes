@@ -1,4 +1,5 @@
 import { Scene3D } from "@components/3d/Scene3D";
+import { Colors } from "@components/customization/Colors";
 
 export const AppLayout: React.FC = () => {
   return (
@@ -17,14 +18,7 @@ export const AppLayout: React.FC = () => {
       </div>
 
       <div className="w-2/5 flex flex-col justify-center p-4 border-l border-stone-400/20">
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-gray-200/50 h-fit">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Select Color
-          </h2>
-          <p className="text-sm text-gray-500">
-            Choose shoe color to customize
-          </p>
-        </div>
+        <Colors />
       </div>
     </main>
   );
