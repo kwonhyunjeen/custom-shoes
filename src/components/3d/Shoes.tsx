@@ -11,7 +11,7 @@ export const Shoes = () => {
   const cameraControlsRef = useRef<CameraControls>(null!);
   const [isRotating, setIsRotating] = useState(true);
 
-  const gltf = useLoader(GLTFLoader, "/models/custom.glb");
+  const gltf = useLoader(GLTFLoader, "/models/shoes.glb");
 
   const shoesClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
