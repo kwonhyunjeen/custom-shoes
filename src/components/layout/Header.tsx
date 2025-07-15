@@ -1,26 +1,12 @@
-interface HeaderProps {
-  shoeModel: string;
-  price: number;
-}
-
-export const Header: React.FC<HeaderProps> = ({ shoeModel, price }) => {
+export const Header = () => {
   return (
-    <header className="grid grid-cols-2 py-6 px-8 min-w-0 bg-black">
-      <div className=" min-w-0 grid grid-cols-2">
-        <h1 className="text-md font-light tracking-wide text-white whitespace-nowrap">
+    <header className="fixed top-0 left-0 right-0 z-50 grid grid-cols-2 py-6 px-8 min-w-0 bg-black bg-gradient-to-r from-stone-600 via-stone-300 to-stone-600">
+      <div className=" min-w-0 flex">
+        <h1 className="text-md font-light tracking-wide text-white whitespace-nowrap mr-1">
           KWONHYUNJIN©
         </h1>
-        <span className="text-md font-thin text-gray-400 whitespace-nowrap -ml-4">
+        <span className="text-md font-thin text-white/90 whitespace-nowrap">
           2025
-        </span>
-      </div>
-
-      <div className="flex flex-col items-end md:flex-row md:items-center md:gap-4 min-w-0">
-        <span className="text-sm font-mono text-gray-500 truncate">
-          {shoeModel}
-        </span>
-        <span className="text-sm font-mono text-gray-500 whitespace-nowrap">
-          ${price.toFixed(2)}
         </span>
       </div>
     </header>
