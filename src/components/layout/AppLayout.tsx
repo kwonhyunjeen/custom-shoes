@@ -5,7 +5,7 @@ import { Parts } from "@components/customization/Parts";
 export const AppLayout = () => {
   return (
     <main className="flex h-screen pt-20 bg-gradient-to-r from-stone-600 via-stone-300 to-stone-600">
-      <div className="w-1/3 flex flex-col justify-center items-end p-4">
+      <div className="w-1/3 flex justify-center items-center p-4">
         <Parts />
       </div>
 
@@ -13,7 +13,7 @@ export const AppLayout = () => {
         <Scene3D />
       </div>
 
-      <div className="w-2/5 flex flex-col justify-center p-4">
+      <div className="w-2/5 flex flex-col justify-center items-center p-4">
         <Colors />
       </div>
     </main>
