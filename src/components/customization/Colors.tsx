@@ -1,10 +1,7 @@
-import { useState } from "react";
-
-interface ColorOption {
-  color: string;
-  name: string;
-  id: string;
-}
+import {
+  useCustomization,
+  type ColorOption,
+} from "@/contexts/CustomizationContext";
 
 const colorList: ColorOption[] = [
   {
@@ -70,16 +67,18 @@ const colorList: ColorOption[] = [
 ];
 
 export const Colors = () => {
-  const [selectedColor, setSelectedColor] = useState<string>(colorList[0].id);
+  const { selectedColor, setSelectedColor } = useCustomization();
 
-  const handleColorSelect = (colorId: string) => {
-    setSelectedColor(colorId);
+  const currentSelectedColor = selectedColor || colorList[0];
+
+  const handleColorSelect = (color: ColorOption) => {
+    setSelectedColor(color);
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent, colorId: string) => {
+  const handleKeyDown = (event: React.KeyboardEvent, color: ColorOption) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      handleColorSelect(colorId);
+      handleColorSelect(color);
     }
   };
 
@@ -100,7 +99,7 @@ export const Colors = () => {
         aria-labelledby="color-selection-heading"
       >
         {colorList.map((color) => {
-          const isSelected = selectedColor === color.id;
+          const isSelected = currentSelectedColor.id === color.id;
           return (
             <button
               key={color.id}
@@ -112,8 +111,8 @@ export const Colors = () => {
                     : "hover:scale-102 hover:shadow-md"
                 }
               `}
-              onClick={() => handleColorSelect(color.id)}
-              onKeyDown={(e) => handleKeyDown(e, color.id)}
+              onClick={() => handleColorSelect(color)}
+              onKeyDown={(e) => handleKeyDown(e, color)}
               aria-label={`Select ${color.name} color`}
               aria-pressed={isSelected}
               role="radio"
@@ -154,7 +153,7 @@ export const Colors = () => {
         <p className="text-sm text-gray-500">
           Selected:{" "}
           <span className="font-medium text-gray-900">
-            {colorList.find((c) => c.id === selectedColor)?.name}
+            {currentSelectedColor.name}
           </span>
         </p>
       </div>

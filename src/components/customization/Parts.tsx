@@ -1,12 +1,9 @@
-import { useState } from "react";
 import { ScrollPicker } from "../ui/ScrollPicker";
 import { cn } from "@/utils/className";
-
-interface ShoePart {
-  id: string;
-  name: string;
-  displayName: string;
-}
+import {
+  useCustomization,
+  type ShoePart,
+} from "@/contexts/CustomizationContext";
 
 const SHOE_PARTS: ShoePart[] = [
   {
@@ -53,28 +50,16 @@ const SHOE_PARTS: ShoePart[] = [
 ];
 
 interface PartsProps {
-  selectedPart?: ShoePart;
-  onPartChange?: (part: ShoePart) => void;
   disabled?: boolean;
 }
 
-export const Parts = ({
-  selectedPart,
-  onPartChange,
-  disabled = false,
-}: PartsProps) => {
-  const [internalSelectedPart, setInternalSelectedPart] = useState<ShoePart>(
-    selectedPart || SHOE_PARTS[3],
-  );
+export const Parts = ({ disabled = false }: PartsProps) => {
+  const { selectedPart, setSelectedPart } = useCustomization();
 
-  // 제어 컴포넌트 vs 비제어 컴포넌트 처리
-  const currentSelectedPart = selectedPart ?? internalSelectedPart;
+  const currentSelectedPart = selectedPart || SHOE_PARTS[0];
 
   const handleSelectionChange = (part: ShoePart) => {
-    if (!selectedPart) {
-      setInternalSelectedPart(part);
-    }
-    onPartChange?.(part);
+    setSelectedPart(part);
   };
 
   const renderPartItem = (part: ShoePart, isSelected: boolean) => (
