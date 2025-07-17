@@ -10,7 +10,8 @@
   "scripts": {
     "docker:start": "supabase start",
     "docker:stop": "supabase stop",
-    "docker:status": "supabase status"
+    "docker:status": "supabase status",
+    "dev": "supabase functions serve"
   },
   "devDependencies": {
     "supabase": "^2.31.4"
