@@ -1,12 +1,13 @@
 import { Header } from "@/components/layout/Header";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { CustomizationProvider } from "@/contexts/CustomizationContext";
 
 function App() {
   return (
-    <>
-      <Header shoeModel="3045MSAP022" price={125} />
+    <CustomizationProvider>
+      <Header />
       <AppLayout />
-    </>
+    </CustomizationProvider>
   );
 }
 

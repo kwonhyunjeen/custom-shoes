@@ -1,26 +1,20 @@
 import { Scene3D } from "@components/3d/Scene3D";
+import { Colors } from "@components/customization/Colors";
+import { Parts } from "@components/customization/Parts";
 
-export const AppLayout: React.FC = () => {
+export const AppLayout = () => {
   return (
-    <main className="grid grid-cols-3 h-[calc(100vh-120px)]">
-      {/* 왼쪽: 특성 설명 & 커스터마이징 옵션 */}
-      <div className="p-8 border-r border-gray-200 overflow-y-auto">
-        {/* <CustomizationOptions
-          selectedPart={selectedPart}
-          onPartChange={setSelectedPart}
-        /> */}
-        <div>CustomizationOptions</div>
+    <main className="flex h-screen pt-20 bg-gradient-to-r from-stone-600 via-stone-300 to-stone-600">
+      <div className="w-1/3 flex justify-center items-center p-4">
+        <Parts />
       </div>
 
-      {/* 중앙: 3D 신발 모델 */}
-      <div className="relative">
+      <div className="w-3/5 relative">
         <Scene3D />
       </div>
 
-      {/* 오른쪽: 세부 커스터마이징 패널 */}
-      <div className="p-8 border-l border-gray-200 overflow-y-auto">
-        {/* <CustomizationPanel selectedPart={selectedPart} /> */}
-        <div>CustomizationPanel</div>
+      <div className="w-2/5 flex flex-col justify-center items-center p-4">
+        <Colors />
       </div>
     </main>
   );
