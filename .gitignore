@@ -28,7 +28,8 @@ dist-ssr
 .branches
 .temp
 
-# dotenvx
-.env.keys
-.env.local
-.env.*.local
+# dotenv
+.env
+.env.*
+!.env.example
+!.env.*.example

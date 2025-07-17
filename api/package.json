@@ -11,7 +11,7 @@
     "docker:start": "supabase start",
     "docker:stop": "supabase stop",
     "docker:status": "supabase status",
-    "dev": "supabase functions serve --no-verify-jwt"
+    "dev": "supabase functions --env-file .env serve --no-verify-jwt"
   },
   "devDependencies": {
     "supabase": "^2.31.4"
