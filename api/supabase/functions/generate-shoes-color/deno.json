@@ -1,3 +1,6 @@
 {
-  "imports": {}
+  "imports": {
+    "@langchain/cerebras": "npm:@langchain/cerebras@0.0.2",
+    "@langchain/core": "npm:@langchain/core@0.3.64"
+  }
 }
