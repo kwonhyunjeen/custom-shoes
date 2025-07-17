@@ -3,27 +3,31 @@
 pre-commit:
   parallel: true
   commands:
-    lint:
-      glob: "*.{js,jsx,ts,tsx}"
-      run: pnpm eslint {staged_files} --fix
-      stage_fixed: true
-
     format:
       glob: "*.{js,jsx,ts,tsx,json,css,md}"
       run: pnpm prettier --write {staged_files}
       stage_fixed: true
 
+    lint:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: pnpm eslint {staged_files} --fix
+      root: "app/"
+      stage_fixed: true
+
     typecheck:
       run: pnpm tsc --noEmit
+      root: "app/"
 
 pre-push:
   parallel: true
   commands:
     build:
       run: pnpm build
+      root: "app/"
 
     lint-all:
       run: pnpm lint
+      root: "app/"
 
 commit-msg:
   commands:
