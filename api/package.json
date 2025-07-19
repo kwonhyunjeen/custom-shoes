@@ -1,0 +1,20 @@
+{
+  "name": "custom-shoes-api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@9.8.0",
+  "engines": {
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "postinstall": "node scripts/deno-install.js",
+    "docker:start": "supabase start",
+    "docker:stop": "supabase stop",
+    "docker:status": "supabase status",
+    "dev": "supabase functions --env-file .env serve --no-verify-jwt"
+  },
+  "devDependencies": {
+    "supabase": "^2.31.4"
+  }
+}
