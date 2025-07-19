@@ -40,7 +40,7 @@ export const ScrollPicker = <T,>({
   const [isScrolling, setIsScrolling] = useState(false);
   const [scrollBasedIndex, setScrollBasedIndex] = useState(0); // 스크롤 위치 기반 인덱스
   const isInitializedRef = useRef(false);
-  const scrollTimeoutRef = useRef<number | null>(null);
+  const scrollTimeoutRef = useRef<number>(undefined);
   // selectedItem에서 기본 인덱스 계산
   const selectedIndex = useMemo(() => {
     if (!selectedItem) return 0;

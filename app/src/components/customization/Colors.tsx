@@ -5,10 +5,7 @@ import {
 } from "@/contexts/CustomizationContext";
 
 export const Colors = () => {
-  const { currentPartColor: currentPartColorProp, changePartColor } =
-    useCustomization();
-
-  const currentPartColor = currentPartColorProp || COLOR_OPTIONS[0];
+  const { currentPartColor, changePartColor } = useCustomization();
 
   const handleColorSelect = (color: ColorOption) => {
     changePartColor(color.id);

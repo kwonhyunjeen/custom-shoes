@@ -152,9 +152,9 @@ export const COLOR_OPTIONS = [
 ] as const satisfies ColorOption[];
 
 interface CustomizationContextType {
-  shoesColors: Record<ShoePart["id"], ColorOption["id"] | null>;
-  currentPart: ShoePart | null;
-  currentPartColor: ColorOption | null;
+  shoesColors: Record<ShoePart["id"], ColorOption["id"]>;
+  currentPart: ShoePart;
+  currentPartColor: ColorOption;
   selectPart: (part: ShoePart["id"]) => void;
   changePartColor: (color: ColorOption["id"]) => void;
   changePartColors: (
@@ -163,9 +163,9 @@ interface CustomizationContextType {
   resetPartColor: () => void;
 }
 
-const CustomizationContext = createContext<CustomizationContextType | null>(
-  null,
-);
+const CustomizationContext = createContext<
+  CustomizationContextType | undefined
+>(undefined);
 
 interface CustomizationProviderProps {
   children: ReactNode;
@@ -175,27 +175,34 @@ export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
   children,
 }) => {
   const [shoesColors, setShoesColors] = useState<
-    Record<ShoePart["id"], ColorOption["id"] | null>
+    Record<ShoePart["id"], ColorOption["id"]>
   >(
     SHOE_PARTS.reduce(
       (acc, part) => {
-        acc[part.id] = null;
+        acc[part.id] = "white";
         return acc;
       },
-      {} as Record<ShoePart["id"], ColorOption["id"] | null>,
+      {} as Record<ShoePart["id"], ColorOption["id"]>,
     ),
   );
 
-  const [currentPartId, selectPartId] = useState<ShoePart["id"] | null>(null);
+  const [currentPartId, selectPartId] = useState<ShoePart["id"]>("collar");
 
   const currentPart = useMemo(() => {
-    return SHOE_PARTS.find((part) => part.id === currentPartId) || null;
+    const part = SHOE_PARTS.find((part) => part.id === currentPartId);
+    if (!part) {
+      throw new Error(`Part with id ${currentPartId} not found`);
+    }
+    return part;
   }, [currentPartId]);
 
   const currentPartColor = useMemo(() => {
-    const currentColorId = currentPartId ? shoesColors[currentPartId] : null;
-    if (!currentColorId) return null;
-    return COLOR_OPTIONS.find((color) => color.id === currentColorId) || null;
+    const currentColorId = shoesColors[currentPartId];
+    const color = COLOR_OPTIONS.find((color) => color.id === currentColorId);
+    if (!color) {
+      throw new Error(`Color with id ${currentColorId} not found`);
+    }
+    return color;
   }, [currentPartId, shoesColors]);
 
   const selectPart = useCallback((partId: ShoePart["id"]) => {
@@ -227,7 +234,7 @@ export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
     if (!currentPartId) return;
     setShoesColors((prevCustomization) => ({
       ...prevCustomization,
-      [currentPartId]: null,
+      [currentPartId]: "white",
     }));
   }, [currentPartId]);
 

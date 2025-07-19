@@ -11,9 +11,7 @@ interface PartsProps {
 }
 
 export const Parts = ({ disabled = false }: PartsProps) => {
-  const { currentPart: currentPartProp, selectPart } = useCustomization();
-
-  const currentPart = currentPartProp || SHOE_PARTS[0];
+  const { currentPart, selectPart } = useCustomization();
 
   const handleSelectionChange = (part: ShoePart) => {
     selectPart(part.id);
