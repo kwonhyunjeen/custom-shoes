@@ -14,6 +14,16 @@ import {
 import { RunnableSequence } from "@langchain/core/runnables";
 import * as z from "zod";
 
+const MODE = Deno.env.get("MODE");
+const CEREBRAS_API_KEY = Deno.env.get("CEREBRAS_API_KEY");
+
+// TODO: production Origin 설정
+const corsHeaders = {
+  "Access-Control-Allow-Origin": MODE === "production" ? "http://TODO" : "*",
+  "Access-Control-Allow-Headers": "content-type",
+  "Access-Control-Allow-Methods": "OPTIONS, POST",
+};
+
 // 프롬프트 토큰을 줄이기 위해 `z.union([z.literal("black"), ...])` 대신 `z.string()`로 선언
 const outputSchema = z.object({
   collar: z.string(),
@@ -35,21 +45,26 @@ const outputParser = StructuredOutputParser.fromZodSchema(outputSchema);
 const outputFormatInstructions = outputParser.getFormatInstructions();
 
 Deno.serve(async (req) => {
-  const { message } = await req.json();
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
 
-  const CEREBRAS_API_KEY = Deno.env.get("CEREBRAS_API_KEY");
+  const { message } = await req.json();
 
   if (!CEREBRAS_API_KEY) {
     return new Response(
       JSON.stringify({ error: "CEREBRAS_API_KEY is not set" }),
-      { status: 500, headers: { "Content-Type": "application/json" } },
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 
   if (!message) {
     return new Response(JSON.stringify({ error: "Message is required" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
@@ -99,7 +114,7 @@ black, white, cobblestone, sport-red, sail, old-royal, royal-tint, pink-foam, ku
   // console.debug("Output:", output);
 
   return new Response(JSON.stringify(output), {
-    headers: { "Content-Type": "application/json" },
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });
 

@@ -152,10 +152,14 @@ export const COLOR_OPTIONS = [
 ] as const satisfies ColorOption[];
 
 interface CustomizationContextType {
+  shoesColors: Record<ShoePart["id"], ColorOption["id"] | null>;
   currentPart: ShoePart | null;
   currentPartColor: ColorOption | null;
   selectPart: (part: ShoePart["id"]) => void;
   changePartColor: (color: ColorOption["id"]) => void;
+  changePartColors: (
+    colors: Partial<Record<ShoePart["id"], ColorOption["id"]>>,
+  ) => void;
   resetPartColor: () => void;
 }
 
@@ -170,7 +174,7 @@ interface CustomizationProviderProps {
 export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
   children,
 }) => {
-  const [shoesCustomization, setShoesCustomization] = useState<
+  const [shoesColors, setShoesColors] = useState<
     Record<ShoePart["id"], ColorOption["id"] | null>
   >(
     SHOE_PARTS.reduce(
@@ -189,12 +193,10 @@ export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
   }, [currentPartId]);
 
   const currentPartColor = useMemo(() => {
-    const currentColorId = currentPartId
-      ? shoesCustomization[currentPartId]
-      : null;
+    const currentColorId = currentPartId ? shoesColors[currentPartId] : null;
     if (!currentColorId) return null;
     return COLOR_OPTIONS.find((color) => color.id === currentColorId) || null;
-  }, [currentPartId, shoesCustomization]);
+  }, [currentPartId, shoesColors]);
 
   const selectPart = useCallback((partId: ShoePart["id"]) => {
     selectPartId(partId);
@@ -203,7 +205,7 @@ export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
   const changePartColor = useCallback(
     (colorId: ColorOption["id"]) => {
       if (!currentPartId) return;
-      setShoesCustomization((prevCustomization) => ({
+      setShoesColors((prevCustomization) => ({
         ...prevCustomization,
         [currentPartId]: colorId,
       }));
@@ -211,9 +213,19 @@ export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
     [currentPartId],
   );
 
+  const changePartColors = useCallback(
+    (colors: Partial<Record<ShoePart["id"], ColorOption["id"]>>) => {
+      setShoesColors((prevCustomization) => ({
+        ...prevCustomization,
+        ...colors,
+      }));
+    },
+    [],
+  );
+
   const resetPartColor = useCallback(() => {
     if (!currentPartId) return;
-    setShoesCustomization((prevCustomization) => ({
+    setShoesColors((prevCustomization) => ({
       ...prevCustomization,
       [currentPartId]: null,
     }));
@@ -222,10 +234,12 @@ export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
   return (
     <CustomizationContext.Provider
       value={{
+        shoesColors,
         currentPart,
         currentPartColor,
         selectPart,
         changePartColor,
+        changePartColors,
         resetPartColor,
       }}
     >
