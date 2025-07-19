@@ -1,65 +1,22 @@
 import { ScrollPicker } from "../ui/ScrollPicker";
 import { cn } from "@/utils/className";
 import {
+  SHOE_PARTS,
   useCustomization,
   type ShoePart,
 } from "@/contexts/CustomizationContext";
-
-const SHOE_PARTS: ShoePart[] = [
-  {
-    id: "collar",
-    name: "Collar",
-    displayName: "Collar",
-  },
-  {
-    id: "eyestay",
-    name: "Eyestay",
-    displayName: "Eyestay",
-  },
-  {
-    id: "heel_counter",
-    name: "Heel_Counter",
-    displayName: "Heel Counter",
-  },
-  { id: "insole", name: "Insole", displayName: "Insole" },
-  { id: "laces", name: "Laces", displayName: "Laces" },
-  { id: "logo", name: "Logo", displayName: "Logo" },
-  {
-    id: "midsole",
-    name: "Midsole",
-    displayName: "Midsole",
-  },
-  {
-    id: "mudguard",
-    name: "Mudguard",
-    displayName: "Mudguard",
-  },
-  {
-    id: "outsole",
-    name: "Outsole",
-    displayName: "Outsole",
-  },
-  {
-    id: "quarter",
-    name: "Quarter",
-    displayName: "Quarter",
-  },
-  { id: "toe", name: "Toe", displayName: "Toe" },
-  { id: "tongue", name: "Tongue", displayName: "Tongue" },
-  { id: "vamp", name: "Vamp", displayName: "Vamp" },
-];
 
 interface PartsProps {
   disabled?: boolean;
 }
 
 export const Parts = ({ disabled = false }: PartsProps) => {
-  const { selectedPart, setSelectedPart } = useCustomization();
+  const { currentPart: currentPartProp, selectPart } = useCustomization();
 
-  const currentSelectedPart = selectedPart || SHOE_PARTS[0];
+  const currentPart = currentPartProp || SHOE_PARTS[0];
 
   const handleSelectionChange = (part: ShoePart) => {
-    setSelectedPart(part);
+    selectPart(part.id);
   };
 
   const renderPartItem = (part: ShoePart, isSelected: boolean) => (
@@ -86,7 +43,7 @@ export const Parts = ({ disabled = false }: PartsProps) => {
 
       <ScrollPicker
         items={SHOE_PARTS}
-        selectedItem={currentSelectedPart}
+        selectedItem={currentPart}
         onSelectionChange={handleSelectionChange}
         renderItem={renderPartItem}
         keyExtractor={(part) => part.id}

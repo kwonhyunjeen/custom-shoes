@@ -1,24 +1,162 @@
-import React, { createContext, useState, use } from "react";
+import React, {
+  createContext,
+  useState,
+  use,
+  useMemo,
+  useCallback,
+} from "react";
 import type { ReactNode } from "react";
 
 export interface ShoePart {
-  id: string;
+  id:
+    | "collar"
+    | "eyestay"
+    | "heel_counter"
+    | "insole"
+    | "laces"
+    | "logo"
+    | "midsole"
+    | "mudguard"
+    | "outsole"
+    | "quarter"
+    | "toe"
+    | "tongue"
+    | "vamp";
   name: string;
   displayName: string;
 }
 
 export interface ColorOption {
-  id: string;
+  id:
+    | "black"
+    | "white"
+    | "cobblestone"
+    | "sport-red"
+    | "sail"
+    | "old-royal"
+    | "royal-tint"
+    | "pink-foam"
+    | "kumquat"
+    | "tour-yellow"
+    | "light-bone"
+    | "malachite";
   color: string;
   name: string;
 }
 
+export const SHOE_PARTS = [
+  {
+    id: "collar",
+    name: "Collar",
+    displayName: "Collar",
+  },
+  {
+    id: "eyestay",
+    name: "Eyestay",
+    displayName: "Eyestay",
+  },
+  {
+    id: "heel_counter",
+    name: "Heel_Counter",
+    displayName: "Heel Counter",
+  },
+  { id: "insole", name: "Insole", displayName: "Insole" },
+  { id: "laces", name: "Laces", displayName: "Laces" },
+  { id: "logo", name: "Logo", displayName: "Logo" },
+  {
+    id: "midsole",
+    name: "Midsole",
+    displayName: "Midsole",
+  },
+  {
+    id: "mudguard",
+    name: "Mudguard",
+    displayName: "Mudguard",
+  },
+  {
+    id: "outsole",
+    name: "Outsole",
+    displayName: "Outsole",
+  },
+  {
+    id: "quarter",
+    name: "Quarter",
+    displayName: "Quarter",
+  },
+  { id: "toe", name: "Toe", displayName: "Toe" },
+  { id: "tongue", name: "Tongue", displayName: "Tongue" },
+  { id: "vamp", name: "Vamp", displayName: "Vamp" },
+] as const satisfies ShoePart[];
+
+export const COLOR_OPTIONS = [
+  {
+    id: "black",
+    color: "#000000",
+    name: "Black",
+  },
+  {
+    id: "white",
+    color: "#ffffff",
+    name: "White",
+  },
+  {
+    id: "cobblestone",
+    color: "#979C98",
+    name: "Cobblestone",
+  },
+  {
+    id: "sport-red",
+    color: "#9F072D",
+    name: "Sport Red",
+  },
+  {
+    id: "sail",
+    color: "#D4CCC3",
+    name: "Sail",
+  },
+  {
+    id: "old-royal",
+    color: "#151468",
+    name: "Old Royal",
+  },
+  {
+    id: "royal-tint",
+    color: "#A0BBE0",
+    name: "Royal Tint",
+  },
+  {
+    id: "pink-foam",
+    color: "#E8CED2",
+    name: "Pink Foam",
+  },
+  {
+    id: "kumquat",
+    color: "#E48F3E",
+    name: "Kumquat",
+  },
+  {
+    id: "tour-yellow",
+    color: "#FFD73D",
+    name: "Tour Yellow",
+  },
+  {
+    id: "light-bone",
+    color: "#EDEBDE",
+    name: "Light Bone",
+  },
+  {
+    id: "malachite",
+    color: "#316E55",
+    name: "Malachite",
+  },
+] as const satisfies ColorOption[];
+
 interface CustomizationContextType {
-  selectedPart: ShoePart | null;
-  selectedColor: ColorOption | null;
-  setSelectedPart: (part: ShoePart) => void;
-  setSelectedColor: (color: ColorOption) => void;
-  resetColor: () => void;
+  currentPart: ShoePart | null;
+  currentPartColor: ColorOption | null;
+  selectPart: (part: ShoePart["id"]) => void;
+  changePartColor: (color: ColorOption["id"]) => void;
+  resetPartColor: () => void;
 }
 
 const CustomizationContext = createContext<CustomizationContextType | null>(
@@ -32,26 +170,63 @@ interface CustomizationProviderProps {
 export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
   children,
 }) => {
-  const [selectedPart, setSelectedPart] = useState<ShoePart | null>(null);
-  const [selectedColor, setSelectedColor] = useState<ColorOption | null>(null);
+  const [shoesCustomization, setShoesCustomization] = useState<
+    Record<ShoePart["id"], ColorOption["id"] | null>
+  >(
+    SHOE_PARTS.reduce(
+      (acc, part) => {
+        acc[part.id] = null;
+        return acc;
+      },
+      {} as Record<ShoePart["id"], ColorOption["id"] | null>,
+    ),
+  );
 
-  const handleSetSelectedPart = (part: ShoePart) => {
-    setSelectedPart(part);
-    setSelectedColor(null); // 파트 변경 시 색상 초기화
-  };
+  const [currentPartId, selectPartId] = useState<ShoePart["id"] | null>(null);
 
-  const resetColor = () => {
-    setSelectedColor(null);
-  };
+  const currentPart = useMemo(() => {
+    return SHOE_PARTS.find((part) => part.id === currentPartId) || null;
+  }, [currentPartId]);
+
+  const currentPartColor = useMemo(() => {
+    const currentColorId = currentPartId
+      ? shoesCustomization[currentPartId]
+      : null;
+    if (!currentColorId) return null;
+    return COLOR_OPTIONS.find((color) => color.id === currentColorId) || null;
+  }, [currentPartId, shoesCustomization]);
+
+  const selectPart = useCallback((partId: ShoePart["id"]) => {
+    selectPartId(partId);
+  }, []);
+
+  const changePartColor = useCallback(
+    (colorId: ColorOption["id"]) => {
+      if (!currentPartId) return;
+      setShoesCustomization((prevCustomization) => ({
+        ...prevCustomization,
+        [currentPartId]: colorId,
+      }));
+    },
+    [currentPartId],
+  );
+
+  const resetPartColor = useCallback(() => {
+    if (!currentPartId) return;
+    setShoesCustomization((prevCustomization) => ({
+      ...prevCustomization,
+      [currentPartId]: null,
+    }));
+  }, [currentPartId]);
 
   return (
     <CustomizationContext.Provider
       value={{
-        selectedPart,
-        selectedColor,
-        setSelectedPart: handleSetSelectedPart,
-        setSelectedColor,
-        resetColor,
+        currentPart,
+        currentPartColor,
+        selectPart,
+        changePartColor,
+        resetPartColor,
       }}
     >
       {children}

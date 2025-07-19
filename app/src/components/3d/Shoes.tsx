@@ -27,7 +27,7 @@ const CAMERA_POSITIONS: Record<
 };
 
 export const Shoes = () => {
-  const { selectedPart, selectedColor } = useCustomization();
+  const { currentPart, currentPartColor } = useCustomization();
   const gltf = useLoader(GLTFLoader, "/models/shoes.glb");
   const meshMaterialsRef = useRef<Map<string, THREE.MeshStandardMaterial>>(
     new Map(),
@@ -56,8 +56,8 @@ export const Shoes = () => {
 
   // 파트가 변경될 때 카메라 이동 및 깜빡임 애니메이션
   useEffect(() => {
-    if (selectedPart && meshMaterialsRef.current.size > 0) {
-      const partName = selectedPart.name;
+    if (currentPart && meshMaterialsRef.current.size > 0) {
+      const partName = currentPart.name;
       const leftMeshName = `${partName}_Left`;
       const rightMeshName = `${partName}_Right`;
 
@@ -75,7 +75,7 @@ export const Shoes = () => {
       }
 
       // 카메라 이동 애니메이션
-      const cameraPosition = CAMERA_POSITIONS[selectedPart.id];
+      const cameraPosition = CAMERA_POSITIONS[currentPart.id];
       if (cameraPosition && cameraControlsRef.current) {
         void cameraControlsRef.current.setLookAt(
           ...cameraPosition.position,
@@ -101,12 +101,12 @@ export const Shoes = () => {
 
       animateBlink();
     }
-  }, [selectedPart]);
+  }, [currentPart]);
 
   // 선택된 색상이 변경될 때 색상 적용
   useEffect(() => {
-    if (selectedPart && selectedColor && meshMaterialsRef.current.size > 0) {
-      const partName = selectedPart.name;
+    if (currentPart && currentPartColor && meshMaterialsRef.current.size > 0) {
+      const partName = currentPart.name;
       const leftMeshName = `${partName}_Left`;
       const rightMeshName = `${partName}_Right`;
 
@@ -114,13 +114,13 @@ export const Shoes = () => {
       const rightMaterial = meshMaterialsRef.current.get(rightMeshName);
 
       if (leftMaterial) {
-        leftMaterial.color = new THREE.Color(selectedColor.color);
+        leftMaterial.color = new THREE.Color(currentPartColor.color);
       }
       if (rightMaterial) {
-        rightMaterial.color = new THREE.Color(selectedColor.color);
+        rightMaterial.color = new THREE.Color(currentPartColor.color);
       }
     }
-  }, [selectedColor, selectedPart]);
+  }, [currentPartColor, currentPart]);
 
   const shoesClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
