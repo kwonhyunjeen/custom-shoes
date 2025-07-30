@@ -1,6 +1,7 @@
 import { Scene3D } from "@components/3d/Scene3D";
 import { Colors } from "@components/customization/Colors";
 import { Parts } from "@components/customization/Parts";
+import { Generator } from "@components/customization/Generator";
 
 export const AppLayout = () => {
   return (
@@ -16,6 +17,8 @@ export const AppLayout = () => {
       <div className="w-2/5 flex flex-col justify-center items-center p-4">
         <Colors />
       </div>
+
+      <Generator />
     </main>
   );
 };

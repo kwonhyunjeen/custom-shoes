@@ -1,78 +1,14 @@
 import {
+  COLOR_OPTIONS,
   useCustomization,
   type ColorOption,
 } from "@/contexts/CustomizationContext";
 
-const colorList: ColorOption[] = [
-  {
-    id: "black",
-    color: "#000000",
-    name: "Black",
-  },
-  {
-    id: "white",
-    color: "#ffffff",
-    name: "White",
-  },
-  {
-    id: "cobblestone",
-    color: "#979C98",
-    name: "Cobblestone",
-  },
-  {
-    id: "sport-red",
-    color: "#9F072D",
-    name: "Sport Red",
-  },
-  {
-    id: "sail",
-    color: "#D4CCC3",
-    name: "Sail",
-  },
-  {
-    id: "old-royal",
-    color: "#151468",
-    name: "Old Royal",
-  },
-  {
-    id: "royal-tint",
-    color: "#A0BBE0",
-    name: "Royal Tint",
-  },
-  {
-    id: "pink-foam",
-    color: "#E8CED2",
-    name: "Pink Foam",
-  },
-  {
-    id: "kumquat",
-    color: "#E48F3E",
-    name: "Kumquat",
-  },
-  {
-    id: "tour-yellow",
-    color: "#FFD73D",
-    name: "Tour Yellow",
-  },
-  {
-    id: "light-bone",
-    color: "#EDEBDE",
-    name: "Light Bone",
-  },
-  {
-    id: "malachite",
-    color: "#316E55",
-    name: "Malachite",
-  },
-];
-
 export const Colors = () => {
-  const { selectedColor, setSelectedColor } = useCustomization();
-
-  const currentSelectedColor = selectedColor || colorList[0];
+  const { currentPartColor, changePartColor } = useCustomization();
 
   const handleColorSelect = (color: ColorOption) => {
-    setSelectedColor(color);
+    changePartColor(color.id);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent, color: ColorOption) => {
@@ -98,8 +34,8 @@ export const Colors = () => {
         role="group"
         aria-labelledby="color-selection-heading"
       >
-        {colorList.map((color) => {
-          const isSelected = currentSelectedColor.id === color.id;
+        {COLOR_OPTIONS.map((color) => {
+          const isSelected = currentPartColor.id === color.id;
           return (
             <button
               key={color.id}
@@ -153,7 +89,7 @@ export const Colors = () => {
         <p className="text-sm text-gray-500">
           Selected:{" "}
           <span className="font-medium text-gray-900">
-            {currentSelectedColor.name}
+            {currentPartColor.name}
           </span>
         </p>
       </div>

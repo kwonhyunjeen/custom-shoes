@@ -3,7 +3,10 @@ import { useLoader } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { CameraControls } from "@react-three/drei";
-import { useCustomization } from "@/contexts/CustomizationContext";
+import {
+  useCustomization,
+  COLOR_OPTIONS,
+} from "@/contexts/CustomizationContext";
 import { useEffect, useRef } from "react";
 
 // 각 파트별 최적 카메라 위치 정의 (타겟은 신발 정중앙으로 고정)
@@ -27,12 +30,11 @@ const CAMERA_POSITIONS: Record<
 };
 
 export const Shoes = () => {
-  const { selectedPart, selectedColor } = useCustomization();
+  const { currentPart, shoesColors } = useCustomization();
   const gltf = useLoader(GLTFLoader, "/models/shoes.glb");
   const meshMaterialsRef = useRef<Map<string, THREE.MeshStandardMaterial>>(
     new Map(),
   );
-  const originalColorsRef = useRef<Map<string, THREE.Color>>(new Map());
   const cameraControlsRef = useRef<CameraControls>(null);
 
   // 3D 모델의 메시들을 파트별로 매핑
@@ -45,8 +47,6 @@ export const Shoes = () => {
         ) {
           const meshName = child.name;
           const clonedMaterial = child.material.clone();
-          // 원본 색상 저장
-          originalColorsRef.current.set(meshName, clonedMaterial.color.clone());
           child.material = clonedMaterial;
           meshMaterialsRef.current.set(meshName, clonedMaterial);
         }
@@ -56,26 +56,16 @@ export const Shoes = () => {
 
   // 파트가 변경될 때 카메라 이동 및 깜빡임 애니메이션
   useEffect(() => {
-    if (selectedPart && meshMaterialsRef.current.size > 0) {
-      const partName = selectedPart.name;
+    if (currentPart && meshMaterialsRef.current.size > 0) {
+      const partName = currentPart.name;
       const leftMeshName = `${partName}_Left`;
       const rightMeshName = `${partName}_Right`;
 
       const leftMaterial = meshMaterialsRef.current.get(leftMeshName);
       const rightMaterial = meshMaterialsRef.current.get(rightMeshName);
-      const leftOriginalColor = originalColorsRef.current.get(leftMeshName);
-      const rightOriginalColor = originalColorsRef.current.get(rightMeshName);
-
-      // 원본 색상으로 복원
-      if (leftMaterial && leftOriginalColor) {
-        leftMaterial.color = leftOriginalColor.clone();
-      }
-      if (rightMaterial && rightOriginalColor) {
-        rightMaterial.color = rightOriginalColor.clone();
-      }
 
       // 카메라 이동 애니메이션
-      const cameraPosition = CAMERA_POSITIONS[selectedPart.id];
+      const cameraPosition = CAMERA_POSITIONS[currentPart.id];
       if (cameraPosition && cameraControlsRef.current) {
         void cameraControlsRef.current.setLookAt(
           ...cameraPosition.position,
@@ -90,37 +80,58 @@ export const Shoes = () => {
         if (rightMaterial) rightMaterial.color = new THREE.Color("black");
 
         setTimeout(() => {
-          if (leftMaterial && leftOriginalColor) {
-            leftMaterial.color = leftOriginalColor.clone();
-          }
-          if (rightMaterial && rightOriginalColor) {
-            rightMaterial.color = rightOriginalColor.clone();
+          // 원본 색상 복원
+          const currentColorId = shoesColors[currentPart.id];
+          if (currentColorId) {
+            const colorOption = COLOR_OPTIONS.find(
+              (option) => option.id === currentColorId,
+            );
+            if (colorOption) {
+              if (leftMaterial)
+                leftMaterial.color = new THREE.Color(colorOption.color);
+              if (rightMaterial)
+                rightMaterial.color = new THREE.Color(colorOption.color);
+            }
           }
         }, 1000);
       };
 
       animateBlink();
     }
-  }, [selectedPart]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPart]);
 
-  // 선택된 색상이 변경될 때 색상 적용
+  // 모든 파츠 색상 적용
   useEffect(() => {
-    if (selectedPart && selectedColor && meshMaterialsRef.current.size > 0) {
-      const partName = selectedPart.name;
-      const leftMeshName = `${partName}_Left`;
-      const rightMeshName = `${partName}_Right`;
+    if (meshMaterialsRef.current.size > 0) {
+      Object.entries(shoesColors).forEach(([partId, colorId]) => {
+        if (colorId) {
+          const partName = partId
+            .split("_")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join("_");
 
-      const leftMaterial = meshMaterialsRef.current.get(leftMeshName);
-      const rightMaterial = meshMaterialsRef.current.get(rightMeshName);
+          const leftMeshName = `${partName}_Left`;
+          const rightMeshName = `${partName}_Right`;
 
-      if (leftMaterial) {
-        leftMaterial.color = new THREE.Color(selectedColor.color);
-      }
-      if (rightMaterial) {
-        rightMaterial.color = new THREE.Color(selectedColor.color);
-      }
+          const leftMaterial = meshMaterialsRef.current.get(leftMeshName);
+          const rightMaterial = meshMaterialsRef.current.get(rightMeshName);
+
+          const colorOption = COLOR_OPTIONS.find(
+            (option) => option.id === colorId,
+          );
+          if (colorOption) {
+            if (leftMaterial) {
+              leftMaterial.color = new THREE.Color(colorOption.color);
+            }
+            if (rightMaterial) {
+              rightMaterial.color = new THREE.Color(colorOption.color);
+            }
+          }
+        }
+      });
     }
-  }, [selectedColor, selectedPart]);
+  }, [shoesColors]);
 
   const shoesClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
