@@ -3,7 +3,7 @@ import { Colors } from "@components/customization/Colors";
 import { Parts } from "@components/customization/Parts";
 import { Generator } from "@components/customization/Generator";
 
-export const AppLayout = () => {
+export const ShoeCustomizer = () => {
   return (
     <main className="flex h-screen pt-20 bg-gradient-to-r from-stone-600 via-stone-300 to-stone-600">
       <div className="w-1/3 flex justify-center items-center p-4">
