@@ -5,17 +5,19 @@ import { Generator } from "@components/customization/Generator";
 
 export const ShoeCustomizer = () => {
   return (
-    <main className="flex h-screen pt-20 bg-gradient-to-r from-stone-600 via-stone-300 to-stone-600">
-      <div className="w-1/3 flex justify-center items-center p-4">
-        <Parts />
-      </div>
-
-      <div className="w-3/5 relative">
+    <main className="relative h-screen pt-20 overflow-hidden bg-slate-50">
+      <div className="absolute inset-0 w-full h-full">
         <Scene3D />
       </div>
 
-      <div className="w-2/5 flex flex-col justify-center items-center p-4">
-        <Colors />
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute left-6 top-1/2 transform -translate-y-1/2 pointer-events-auto">
+          <Parts />
+        </div>
+
+        <div className="absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-auto">
+          <Colors />
+        </div>
       </div>
 
       <Generator />
