@@ -5,20 +5,37 @@ import { Generator } from "@components/customization/Generator";
 
 export const ShoeCustomizer = () => {
   return (
-    <main className="flex h-screen pt-20 bg-gradient-to-r from-stone-600 via-stone-300 to-stone-600">
-      <div className="w-1/3 flex justify-center items-center p-4">
-        <Parts />
-      </div>
+    <>
+      <div className="fixed inset-0 bg-gradient-to-br from-zinc-200 to-zinc-100 [clip-path:polygon(0_60%,_100%_15%,_100%_100%,_0_100%)]" />
+      <header className="fixed z-100 top-8 left-10 text-sm">
+        KWONHYUNJIN© <span className="text-neutral-400">2025</span>
+      </header>
+      <main className="relative w-screen h-screen">
+        <h1 className="sr-only">Select Color</h1>
 
-      <div className="w-3/5 relative">
-        <Scene3D />
-      </div>
+        <div className="w-full h-full">
+          <div className="-ml-[30%] -mb-[25%] w-[130%] h-[140%]">
+            <Scene3D />
+          </div>
+        </div>
 
-      <div className="w-2/5 flex flex-col justify-center items-center p-4">
-        <Colors />
-      </div>
+        <div className="absolute top-12 right-12 pb-10 flex py-9 px-8 gap-6 bg-white shadow-2xl rounded-3xl">
+          <div>
+            <h2 className="mb-6 text-neutral-400 text-xs font-semibold uppercase">
+              Select Part
+            </h2>
+            <Parts />
+          </div>
+          <div>
+            <h2 className="mb-6 text-neutral-400 text-xs font-semibold uppercase">
+              Select Color
+            </h2>
+            <Colors />
+          </div>
+        </div>
 
-      <Generator />
-    </main>
+        <Generator />
+      </main>
+    </>
   );
 };

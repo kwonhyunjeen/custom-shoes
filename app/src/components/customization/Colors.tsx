@@ -19,18 +19,9 @@ export const Colors = () => {
   };
 
   return (
-    <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-gray-200/50 h-fit">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-          Customize Your Shoes
-        </h2>
-        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-          Select Color
-        </p>
-      </div>
-
+    <div className="backdrop-blur-md">
       <div
-        className="grid grid-cols-4 gap-3"
+        className="grid grid-cols-4 gap-2 max-h-72 overflow-y-auto scrollbar-default scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2"
         role="group"
         aria-labelledby="color-selection-heading"
       >
@@ -40,12 +31,8 @@ export const Colors = () => {
             <button
               key={color.id}
               className={`
-                relative group rounded-xl p-3 transition-all duration-200 ease-out
-                ${
-                  isSelected
-                    ? "ring-2 ring-stone-600 ring-offset-2 scale-105"
-                    : "hover:scale-102 hover:shadow-md"
-                }
+                relative group rounded-xl p-2 cursor-pointer transition-all duration-200 ease-out
+                ${isSelected ? "" : "hover:scale-103"}
               `}
               onClick={() => handleColorSelect(color)}
               onKeyDown={(e) => handleKeyDown(e, color)}
@@ -54,27 +41,18 @@ export const Colors = () => {
               role="radio"
               aria-checked={isSelected}
             >
-              <div className="flex flex-col items-center space-y-2">
+              <div className="flex flex-col items-center">
                 <div
                   className={`
-                    w-12 h-12 rounded-full border-2 border-gray-200 shadow-sm
-                    transition-all duration-200 ease-out
+                    w-8 h-8 rounded-full border border-gray-300 relative transition-all duration-200 ease-out
                     ${
                       isSelected
-                        ? "shadow-lg transform scale-110"
-                        : "group-hover:border-gray-300 group-hover:shadow-md"
+                        ? "before:content-[''] before:absolute before:-inset-[1px] before:rounded-full before:border before:border-gray-300 before:w-10 before:h-10 before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2"
+                        : ""
                     }
                   `}
                   style={{ backgroundColor: color.color }}
                 />
-                <span
-                  className={`
-                  text-xs font-medium text-center transition-colors duration-200
-                  ${isSelected ? "text-gray-900" : "text-gray-600"}
-                `}
-                >
-                  {color.name}
-                </span>
               </div>
 
               {isSelected && (
@@ -85,13 +63,10 @@ export const Colors = () => {
         })}
       </div>
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-500">
-          Selected:{" "}
-          <span className="font-medium text-gray-900">
-            {currentPartColor.name}
-          </span>
-        </p>
+      <div className="mt-4 text-center">
+        <span className="text-sm font-medium text-gray-900">
+          {currentPartColor.name}
+        </span>
       </div>
     </div>
   );
