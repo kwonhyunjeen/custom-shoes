@@ -21,7 +21,7 @@ export const Colors = () => {
   return (
     <div className="backdrop-blur-md">
       <div
-        className="grid grid-cols-4 gap-2 max-h-72 overflow-y-auto scrollbar-default scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2"
+        className="grid grid-cols-4 gap-2 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2 scroll-smooth"
         role="group"
         aria-labelledby="color-selection-heading"
       >
@@ -31,7 +31,7 @@ export const Colors = () => {
             <button
               key={color.id}
               className={`
-                relative group rounded-xl p-2 cursor-pointer transition-all duration-200 ease-out
+                relative group rounded-xl p-3 cursor-pointer transition-all duration-200 ease-out
                 ${isSelected ? "" : "hover:scale-103"}
               `}
               onClick={() => handleColorSelect(color)}

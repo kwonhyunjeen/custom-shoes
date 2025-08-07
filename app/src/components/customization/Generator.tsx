@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   useCustomization,
   type ColorOption,
@@ -50,7 +50,7 @@ export const Generator = () => {
 
       changePartColors(colors);
       setInput("");
-      setIsOpen(false); // Close after successful generation
+      setIsOpen(false);
     } catch {
       // Handle error silently or show user notification
     } finally {
@@ -69,15 +69,33 @@ export const Generator = () => {
     }
   };
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // 외부 클릭으로 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node) &&
+        isOpen
+      ) {
+        setIsOpen(false);
+        setInput("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
   return (
-    <div className="fixed bottom-10 right-10 z-100">
+    <div className="fixed bottom-10 right-10 z-100" ref={containerRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg hover:shadow-xl p-3 rounded-full transition-all duration-300 hover:scale-110"
+        className="group relative bg-white/90 backdrop-blur-sm cursor-pointer hover:bg-white shadow-lg hover:shadow-xl p-3 rounded-full transition-all duration-300 hover:scale-110"
       >
         <AIIcon className="w-6 h-6 text-stone-600 group-hover:text-stone-800 transition-colors animate-pulse" />
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping opacity-75"></div>
       </button>
       <div
         className={`absolute bottom-0 right-16 transition-all duration-300 ease-out ${
@@ -86,7 +104,7 @@ export const Generator = () => {
             : "translate-x-8 opacity-0 pointer-events-none"
         }`}
       >
-        <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-xl p-4 min-w-80 border border-white/20">
+        <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-xl p-4 min-w-100 border border-white/20">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -96,12 +114,63 @@ export const Generator = () => {
             disabled={isLoading}
             autoFocus={isOpen}
           />
+          <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <div className="flex items-center gap-2 mb-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4 text-stone-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+              <span className="text-xs font-semibold text-stone-600">예시</span>
+            </div>
+            <div className="grid grid-cols-1 gap-2 text-xs">
+              <div className="flex items-start gap-2">
+                <span>🎨</span>
+                <div className="flex text-gray-500 italic">
+                  <div>빨간색 신발로 만들어줘,</div>
+                  <div>&nbsp;Make it red shoes</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span>🍂</span>
+                <div>
+                  <div className="text-gray-500 italic">
+                    Recommend autumn colors
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span>✨</span>
+                <div>
+                  <div className="text-gray-500 italic">
+                    클래식하고 세련된 느낌으로
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span>🎯</span>
+                <div className="flex text-gray-500 italic">
+                  <div>밑창을 검은색으로 바꿔줘,</div>
+                  <div>&nbsp;Change the sole to black</div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="flex gap-2 mt-3">
             <button
               type="button"
               onClick={() => void handleGenerateClick()}
               disabled={!input.trim() || isLoading}
-              className="flex-1 px-4 py-2 bg-stone-600 text-white rounded-md hover:bg-stone-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+              className="flex-1 px-4 py-2 bg-stone-600 text-white rounded-md cursor-pointer hover:bg-stone-700 disabled:bg-gray-300 disabled:cursor-default transition-colors text-sm font-medium"
             >
               {isLoading ? "Generating..." : "Generate"}
             </button>
@@ -111,7 +180,7 @@ export const Generator = () => {
                 setIsOpen(false);
                 setInput("");
               }}
-              className="px-3 py-2 text-gray-500 hover:text-gray-700 transition-colors text-sm"
+              className="px-3 py-2 text-gray-500 cursor-pointer hover:text-gray-700 transition-colors text-sm"
             >
               Cancel
             </button>

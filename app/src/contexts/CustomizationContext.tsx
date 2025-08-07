@@ -40,15 +40,13 @@ export interface ColorOption {
     | "navy"
     | "pink"
     | "burgundy"
-    | "sky-blue"
     | "red"
     | "orange"
     | "purple"
     | "teal"
     | "brown"
     | "coral"
-    | "cocoa"
-    | "sage";
+    | "cocoa";
   color: string;
   name: string;
 }
@@ -192,11 +190,6 @@ export const COLOR_OPTIONS = [
     id: "cocoa",
     color: "#A2857B",
     name: "Cocoa",
-  },
-  {
-    id: "sage",
-    color: "#9CAF88",
-    name: "Sage",
   },
 ] as const satisfies ColorOption[];
 
