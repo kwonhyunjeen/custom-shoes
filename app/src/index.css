@@ -1,7 +1,37 @@
 @import "tailwindcss";
 
-html,
-body,
-#root {
-  @apply h-full;
+@layer base {
+  html,
+  :host {
+    @apply text-neutral-700 bg-neutral-50;
+  }
+
+  html {
+    @apply h-screen;
+  }
+
+  body,
+  #root {
+    @apply min-h-screen;
+  }
+}
+
+@utility scrollbar-hide {
+  /* Firefox */
+  scrollbar-width: none;
+
+  /* Safari and Chrome */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-default {
+  /* Firefox */
+  scrollbar-width: auto;
+
+  /* Safari and Chrome */
+  &::-webkit-scrollbar {
+    display: block;
+  }
 }

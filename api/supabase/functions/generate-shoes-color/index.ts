@@ -86,7 +86,8 @@ Deno.serve(async (req) => {
 You are a helpful assistant that generates shoe color combinations.
 
 The colors you can use are:
-black, white, cobblestone, sport-red, sail, old-royal, royal-tint, pink-foam, kumquat, tour-yellow, light-bone, malachite
+black, gray, white, cream, light-gray, golden, olive, dark-green, royal-blue, navy
+pink, burgundy, red, orange, purple, teal, brown, coral, cocoa, sage
 
 {{outputFormatInstructions}}
 `.trim(),

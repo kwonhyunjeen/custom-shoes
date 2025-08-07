@@ -2,40 +2,36 @@ import { useState, useRef, useCallback, useMemo, useLayoutEffect } from "react";
 import { cn } from "@/utils/className";
 
 interface ScrollPickerProps<T> {
+  keyExtractor?: (item: T) => string;
   items: T[];
   selectedItem?: T;
   onSelectionChange?: (item: T, index: number) => void;
+  disabled?: boolean;
   renderItem?: (item: T, isSelected: boolean) => React.ReactNode;
   className?: string;
   itemClassName?: string;
-  selectedItemClassName?: string;
-  unselectedItemClassName?: string;
-  height?: number;
-  itemHeight?: number;
-  width?: string;
-  keyExtractor?: (item: T) => string;
-  disabled?: boolean;
+  height: number;
+  itemHeight: number;
   snapToCenter?: boolean;
   autoScrollDelay?: number;
 }
 
 export const ScrollPicker = <T,>({
+  keyExtractor = (item) => String(item),
   items,
   selectedItem,
   onSelectionChange,
+  disabled = false,
   renderItem = (item) => String(item),
   className,
   itemClassName,
-  selectedItemClassName,
-  unselectedItemClassName,
-  height = 200,
-  itemHeight = 40,
-  width = "w-full",
-  keyExtractor = (item) => String(item),
-  disabled = false,
+  height,
+  itemHeight,
   snapToCenter = true,
   autoScrollDelay = 150,
 }: ScrollPickerProps<T>) => {
+  const paddingY = (height - itemHeight) / 2;
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const [scrollBasedIndex, setScrollBasedIndex] = useState(0); // 스크롤 위치 기반 인덱스
@@ -88,7 +84,7 @@ export const ScrollPicker = <T,>({
   // 스크롤 이벤트 핸들러 (실시간 중앙 아이템 하이라이트)
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement>) => {
-      if (disabled) return;
+      if (disabled) return event.preventDefault();
 
       const container = event.currentTarget;
       const scrollTop = container.scrollTop;
@@ -136,9 +132,8 @@ export const ScrollPicker = <T,>({
 
   // 아이템 클릭 핸들러
   const handleItemClick = useCallback(
-    (item: T, index: number) => {
-      if (disabled || index === selectedIndex) return;
-
+    (event: React.MouseEvent, item: T, index: number) => {
+      if (disabled || index === selectedIndex) return event.preventDefault();
       onSelectionChange?.(item, index);
     },
     [disabled, selectedIndex, onSelectionChange],
@@ -147,7 +142,7 @@ export const ScrollPicker = <T,>({
   // 키보드 네비게이션
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
-      if (disabled) return;
+      if (disabled) return event.preventDefault();
 
       switch (event.key) {
         case "ArrowUp":
@@ -169,32 +164,25 @@ export const ScrollPicker = <T,>({
     [disabled, selectedIndex, items, onSelectionChange],
   );
 
-  const paddingSize = (height - itemHeight) / 2;
-
   return (
-    <div className={cn("relative", width, className)} style={{ height }}>
-      {/* 중앙 하이라이트 영역 */}
+    <div className={cn("relative", className)} style={{ height }}>
       <div
-        className="absolute left-0 right-0 bg-white/10 border border-white/20 rounded-lg pointer-events-none z-10 transition-opacity duration-200"
+        className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-black/5 border border-black/10 rounded-xl pointer-events-none backdrop-blur-md"
         style={{
-          top: paddingSize,
           height: itemHeight,
-          opacity: isScrolling ? 0.5 : 1,
         }}
       />
-
       <div
         ref={containerRef}
         className={cn(
-          "h-full overflow-auto overflow-x-hidden scrollbar-hide snap-y snap-mandatory overscroll-contain",
+          "h-full overflow-hidden overflow-y-auto scrollbar-hide snap-y snap-mandatory overscroll-contain select-none",
           disabled && "pointer-events-none opacity-50",
         )}
-        style={{ paddingTop: paddingSize, paddingBottom: paddingSize }}
+        style={{ paddingTop: paddingY, paddingBottom: paddingY }}
         onScroll={handleScroll}
         onKeyDown={handleKeyDown}
-        tabIndex={0}
         role="listbox"
-        aria-label="스크롤 선택기"
+        tabIndex={0}
       >
         {items.map((item, index) => {
           const isSelected = index === currentIndex;
@@ -202,30 +190,16 @@ export const ScrollPicker = <T,>({
             <div
               key={keyExtractor(item)}
               className={cn(
-                "flex items-center justify-center snap-center text-2xl cursor-pointer transition-all duration-300 ease-out",
+                "flex items-center justify-center snap-center text-xl cursor-pointer transition-all transform-3d",
                 itemClassName,
                 isSelected
-                  ? cn(
-                      "text-white/90 font-semibold transform scale-105",
-                      selectedItemClassName,
-                    )
-                  : cn(
-                      "text-stone-600 hover:text-stone-500",
-                      unselectedItemClassName,
-                    ),
+                  ? "font-normal scale-105"
+                  : "font-light hover:text-stone-500",
               )}
-              style={{
-                height: itemHeight,
-                // 깜빡임 방지를 위한 transform3d 사용 (GPU 가속)
-                transform: isSelected
-                  ? "translate3d(0, 0, 0) scale(1.05)"
-                  : "translate3d(0, 0, 0) scale(1)",
-                willChange: "transform, color",
-              }}
-              onClick={() => handleItemClick(item, index)}
+              style={{ height: itemHeight }}
+              onClick={(event) => handleItemClick(event, item, index)}
               role="option"
               aria-selected={isSelected}
-              aria-label={`${keyExtractor(item)} ${isSelected ? "선택됨" : ""}`}
             >
               {renderItem(item, isSelected)}
             </div>

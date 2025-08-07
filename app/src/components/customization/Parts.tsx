@@ -1,5 +1,4 @@
 import { ScrollPicker } from "../ui/ScrollPicker";
-import { cn } from "@/utils/className";
 import {
   SHOE_PARTS,
   useCustomization,
@@ -17,42 +16,25 @@ export const Parts = ({ disabled = false }: PartsProps) => {
     selectPart(part.id);
   };
 
-  const renderPartItem = (part: ShoePart, isSelected: boolean) => (
-    <div className="text-center">
-      <div
-        className={cn(
-          "transition-all duration-200",
-          isSelected ? "text-amber-100" : "text-stone-400",
-        )}
-      >
-        {part.displayName}
-      </div>
+  const renderPartItem = (part: ShoePart) => (
+    <div className="text-center uppercase">
+      <div>{part.displayName}</div>
     </div>
   );
 
   return (
-    <div className="h-fit">
-      <h2 className="text-2xl font-semibold text-amber-100 mb-4">
-        Select Parts
-      </h2>
-      <p className="text-sm text-amber-100/80 mb-6 uppercase">
-        Choose shoe parts to customize
-      </p>
-
-      <ScrollPicker
-        items={SHOE_PARTS}
-        selectedItem={currentPart}
-        onSelectionChange={handleSelectionChange}
-        renderItem={renderPartItem}
-        keyExtractor={(part) => part.id}
-        height={240}
-        itemHeight={50}
-        disabled={disabled}
-        snapToCenter={true}
-        selectedItemClassName="text-amber-100 scale-105"
-        unselectedItemClassName="text-stone-400"
-        itemClassName="px-4"
-      />
-    </div>
+    <ScrollPicker
+      keyExtractor={(part) => part.id}
+      items={SHOE_PARTS}
+      selectedItem={currentPart}
+      onSelectionChange={handleSelectionChange}
+      disabled={disabled}
+      renderItem={renderPartItem}
+      className="w-55"
+      itemClassName="px-4"
+      height={300}
+      itemHeight={60}
+      snapToCenter={true}
+    />
   );
 };

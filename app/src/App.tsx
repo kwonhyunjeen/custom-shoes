@@ -1,12 +1,10 @@
-import { Header } from "@/components/layout/Header";
-import { AppLayout } from "@/components/layout/AppLayout";
+import { ShoeCustomizer } from "@/components/customization/ShoeCustomizer";
 import { CustomizationProvider } from "@/contexts/CustomizationContext";
 
 function App() {
   return (
     <CustomizationProvider>
-      <Header />
-      <AppLayout />
+      <ShoeCustomizer />
     </CustomizationProvider>
   );
 }
