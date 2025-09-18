@@ -1,8 +1,6 @@
-import {
-  COLOR_OPTIONS,
-  useCustomization,
-  type ColorOption,
-} from "@/contexts/CustomizationContext";
+import { useCustomization } from "@/contexts/CustomizationContext";
+import { COLOR_OPTIONS } from "@/data/colorOptions";
+import type { ColorOption } from "@/types/customization";
 
 export const Colors = () => {
   const { currentPartColor, changePartColor } = useCustomization();

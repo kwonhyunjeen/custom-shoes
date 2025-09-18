@@ -1,9 +1,7 @@
+import type { ShoePart } from "@/types/customization";
 import { ScrollPicker } from "../ui/ScrollPicker";
-import {
-  SHOE_PARTS,
-  useCustomization,
-  type ShoePart,
-} from "@/contexts/CustomizationContext";
+import { useCustomization } from "@/contexts/CustomizationContext";
+import { SHOE_PARTS } from "@/data/shoeParts";
 
 interface PartsProps {
   disabled?: boolean;
@@ -16,24 +14,17 @@ export const Parts = ({ disabled = false }: PartsProps) => {
     selectPart(part.id);
   };
 
-  const renderPartItem = (part: ShoePart) => (
-    <div className="text-center uppercase">
-      <div>{part.displayName}</div>
-    </div>
-  );
-
   return (
     <ScrollPicker
-      keyExtractor={(part) => part.id}
+      getKey={(part) => part.id}
       items={SHOE_PARTS}
-      selectedItem={currentPart}
+      renderItem={(item) => item.displayName}
       onSelectionChange={handleSelectionChange}
+      selectedItem={currentPart}
+      width={180}
+      height="100%"
+      itemHeight={36}
       disabled={disabled}
-      renderItem={renderPartItem}
-      className="w-55"
-      itemClassName="px-4"
-      height={300}
-      itemHeight={60}
       snapToCenter={true}
     />
   );

@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  useCustomization,
-  type ColorOption,
-  type ShoePart,
-} from "@/contexts/CustomizationContext";
+import { useCustomization } from "@/contexts/CustomizationContext";
+import type { ColorOption, ShoePart } from "@/types/customization";
 
 const AIIcon = ({ className }: { className?: string }) => (
   <svg
