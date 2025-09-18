@@ -39,8 +39,7 @@ export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
     ),
   );
 
-  const [currentPartId, selectPartId] =
-    useState<ShoePart["id"]>("heel_counter");
+  const [currentPartId, selectPartId] = useState<ShoePart["id"]>("mudguard");
 
   const currentPart = useMemo(() => {
     const part = SHOE_PARTS.find((part) => part.id === currentPartId);
