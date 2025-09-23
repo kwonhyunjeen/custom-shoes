@@ -175,15 +175,17 @@ const animateCameraToPart = (
     shoeCenter,
   );
 
-  void controls.setLookAt(
-    cameraPosition[0],
-    cameraPosition[1],
-    cameraPosition[2], // camera position
-    shoeCenter[0],
-    shoeCenter[1],
-    shoeCenter[2], // target (신발 중앙)
-    true, // enableTransition
-  );
+  void controls
+    .normalizeRotations()
+    .setLookAt(
+      cameraPosition[0],
+      cameraPosition[1],
+      cameraPosition[2],
+      shoeCenter[0],
+      shoeCenter[1],
+      shoeCenter[2],
+      true,
+    );
 };
 
 export const Shoes = () => {
