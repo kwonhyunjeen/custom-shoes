@@ -18,31 +18,32 @@ export const Colors = () => {
   };
 
   return (
-    <div className="backdrop-blur-md">
+    <div className="backdrop-blur-md w-144">
       <div
-        className="max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2 scroll-smooth grid-cols"
+        className="max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2 scroll-smooth"
         role="group"
         aria-labelledby="color-selection-heading"
       >
-        {availableColors.map((color) => {
-          const isSelected = currentPartColor.id === color.id;
-          return (
-            <button
-              key={color.id}
-              className={`
+        <div className="flex flex-wrap w-fit mx-auto">
+          {availableColors.map((color) => {
+            const isSelected = currentPartColor.id === color.id;
+            return (
+              <button
+                key={color.id}
+                className={`
                 relative group rounded-xl p-3 cursor-pointer transition-all duration-200 ease-out
                 ${isSelected ? "" : "hover:scale-103"}
               `}
-              onClick={() => handleColorSelect(color)}
-              onKeyDown={(e) => handleKeyDown(e, color)}
-              aria-label={`Select ${color.name} color`}
-              aria-pressed={isSelected}
-              role="radio"
-              aria-checked={isSelected}
-            >
-              <div className="flex flex-col items-center">
-                <div
-                  className={`
+                onClick={() => handleColorSelect(color)}
+                onKeyDown={(e) => handleKeyDown(e, color)}
+                aria-label={`Select ${color.name} color`}
+                aria-pressed={isSelected}
+                role="radio"
+                aria-checked={isSelected}
+              >
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`
                     w-8 h-8 rounded-full border border-gray-300 relative transition-all duration-200 ease-out
                     ${
                       isSelected
@@ -50,16 +51,17 @@ export const Colors = () => {
                         : ""
                     }
                   `}
-                  style={{ backgroundColor: color.color }}
-                />
-              </div>
+                    style={{ backgroundColor: color.color }}
+                  />
+                </div>
 
-              {isSelected && (
-                <div className="absolute inset-0 rounded-xl pointer-events-none" />
-              )}
-            </button>
-          );
-        })}
+                {isSelected && (
+                  <div className="absolute inset-0 rounded-xl pointer-events-none" />
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="mt-4 text-center">
