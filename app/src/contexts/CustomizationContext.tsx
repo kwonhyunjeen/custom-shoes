@@ -14,6 +14,7 @@ import type {
 } from "@/types/customization";
 import { SHOE_PARTS } from "@/data/shoeParts";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
+import { PART_COLOR_RULES } from "@/data/partColorRules";
 
 const CustomizationContext = createContext<
   CustomizationContextType | undefined
@@ -83,6 +84,16 @@ export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
     [],
   );
 
+  const getAvailableColors = useCallback(() => {
+    const rule = PART_COLOR_RULES[currentPartId];
+
+    if (rule === "all") {
+      return COLOR_OPTIONS;
+    }
+
+    return COLOR_OPTIONS.filter((color) => rule.includes(color.id));
+  }, [currentPartId]);
+
   const resetPartColor = useCallback(() => {
     if (!currentPartId) return;
     setShoesColors((prevCustomization) => ({
@@ -94,6 +105,7 @@ export const CustomizationProvider: React.FC<CustomizationProviderProps> = ({
   return (
     <CustomizationContext.Provider
       value={{
+        getAvailableColors,
         shoesColors,
         currentPart,
         currentPartColor,

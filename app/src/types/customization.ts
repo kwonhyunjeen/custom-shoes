@@ -42,6 +42,8 @@ export interface ColorOption {
   name: string;
 }
 
+export type PartColorRule = ColorOption["id"][] | "all";
+
 export interface CustomizationContextType {
   shoesColors: Record<ShoePart["id"], ColorOption["id"]>;
   currentPart: ShoePart;
@@ -51,5 +53,6 @@ export interface CustomizationContextType {
   changePartColors: (
     colors: Partial<Record<ShoePart["id"], ColorOption["id"]>>,
   ) => void;
+  getAvailableColors: () => ColorOption[];
   resetPartColor: () => void;
 }

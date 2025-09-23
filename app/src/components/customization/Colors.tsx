@@ -1,10 +1,11 @@
 import { useCustomization } from "@/contexts/CustomizationContext";
-import { COLOR_OPTIONS } from "@/data/colorOptions";
 import type { ColorOption } from "@/types/customization";
 
 export const Colors = () => {
-  const { currentPartColor, changePartColor } = useCustomization();
+  const { currentPartColor, changePartColor, getAvailableColors } =
+    useCustomization();
 
+  const availableColors = getAvailableColors();
   const handleColorSelect = (color: ColorOption) => {
     changePartColor(color.id);
   };
@@ -19,11 +20,11 @@ export const Colors = () => {
   return (
     <div className="backdrop-blur-md">
       <div
-        className="grid grid-cols-4 gap-2 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2 scroll-smooth"
+        className="max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2 scroll-smooth grid-cols"
         role="group"
         aria-labelledby="color-selection-heading"
       >
-        {COLOR_OPTIONS.map((color) => {
+        {availableColors.map((color) => {
           const isSelected = currentPartColor.id === color.id;
           return (
             <button
