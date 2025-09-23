@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import { Shoes } from "./Shoes";
 
-export const Scene3D: React.FC = () => {
+export const Scene: React.FC = () => {
   return (
     <Canvas
       camera={{ position: [4, 3, 5], fov: 12 }}
