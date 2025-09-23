@@ -1,7 +1,11 @@
 import { Canvas } from "@react-three/fiber";
-import { Shoes } from "./Shoes";
+import type { ReactNode } from "react";
 
-export const Scene: React.FC = () => {
+interface SceneProps {
+  children: ReactNode;
+}
+
+export const Scene = ({ children }: SceneProps) => {
   return (
     <Canvas
       camera={{ position: [4, 3, 5], fov: 12 }}
@@ -64,7 +68,7 @@ export const Scene: React.FC = () => {
         <shadowMaterial opacity={0.15} />
       </mesh>
 
-      <Shoes />
+      {children}
     </Canvas>
   );
 };
