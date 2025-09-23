@@ -1,7 +1,6 @@
-import { Scene } from "@components/customization/Scene";
-import { Colors } from "@components/customization/Colors";
-import { Parts } from "@components/customization/Parts";
-import { Generator } from "@components/customization/Generator";
+import { Scene } from "./Scene";
+import { Generator } from "./Generator";
+import { Panel } from "./Panel";
 
 export const ShoeCustomizer = () => {
   return (
@@ -13,10 +12,7 @@ export const ShoeCustomizer = () => {
         <div className="grow">
           <Scene />
         </div>
-        <div className="absolute w-full left-0 bottom-0 overflow-hidden h-60 flex justify-center items-center gap-14 bg-zinc-100">
-          <Parts />
-          <Colors />
-        </div>
+        <Panel />
         <Generator />
       </main>
     </>
