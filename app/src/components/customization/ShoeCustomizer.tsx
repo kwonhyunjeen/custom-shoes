@@ -5,14 +5,12 @@ import { Shoes } from "./Shoes";
 
 export const ShoeCustomizer = () => {
   return (
-    <>
-      <div className="w-screen h-screen">
-        <Scene>
-          <Shoes />
-        </Scene>
-      </div>
+    <div className="h-screen relative">
+      <Scene>
+        <Shoes />
+      </Scene>
       <Panel />
       <Generator />
-    </>
+    </div>
   );
 };

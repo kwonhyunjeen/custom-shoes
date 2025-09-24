@@ -27,7 +27,7 @@ export const Panel = ({ disabled = false }: PanelProps) => {
   };
 
   return (
-    <div className="absolute w-full left-0 bottom-0 overflow-hidden h-60 flex justify-center items-center gap-14 bg-zinc-100">
+    <div className="absolute left-0 right-0 bottom-0 overflow-hidden h-60 flex justify-center items-center gap-14 bg-zinc-100">
       <ScrollPicker
         getKey={(part) => part.id}
         items={SHOE_PARTS}

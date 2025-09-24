@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @layer base {
-  html,
-  :host {
+  :host,
+  html {
     @apply text-neutral-700 bg-neutral-50;
   }
 
