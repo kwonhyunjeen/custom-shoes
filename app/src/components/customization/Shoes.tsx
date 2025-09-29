@@ -90,7 +90,16 @@ const PART_CAMERA_ANGLES: Record<
   },
 };
 
-// 구면 좌표계를 직교 좌표계로 변환
+const ANIMATION_CONFIG = {
+  TOTAL_DURATION: 1000,
+  FADE_IN: 300,
+  FADE_OUT: 300,
+  FRAME_INTERVAL: 16, // ~60fps
+} as const;
+
+const HIGHLIGHT_COLOR = "#d5e9f7";
+
+// 카메라 각도(azimuth, elevation)를 3D 좌표(x, y, z)로 변환
 const sphericalToCartesian = (
   azimuth: number,
   elevation: number,
@@ -155,6 +164,76 @@ const applyColorToMeshes = (
   });
 };
 
+/**
+ * t값(0~1)에 따라 color1에서 color2로 점진적 색상 변화
+ * 두 색상 사이를 부드럽게 전환 (Linear interpolation)
+ * @param color1 시작 색상 (hex)
+ * @param color2 종료 색상 (hex)
+ * @param t 보간 비율 (0.0 ~ 1.0)
+ */
+const lerpColor = (color1: string, color2: string, t: number): string => {
+  const startColor = new Color(color1);
+  const endColor = new Color(color2);
+  const result = startColor.clone().lerp(endColor, t);
+  return `#${result.getHexString()}`;
+};
+
+const highlightPartMeshes = (
+  meshes: Mesh<BufferGeometry, Material | Material[]>[],
+  originalColor: string,
+  onComplete?: () => void,
+): void => {
+  if (meshes.length === 0) return;
+
+  const holdDuration =
+    ANIMATION_CONFIG.TOTAL_DURATION -
+    ANIMATION_CONFIG.FADE_IN -
+    ANIMATION_CONFIG.FADE_OUT;
+
+  const fadeIn = (elapsed: number) => {
+    const normalizedProgress = Math.min(elapsed / ANIMATION_CONFIG.FADE_IN, 1);
+    const easedProgress = 1 - Math.pow(1 - normalizedProgress, 3);
+    const currentColor = lerpColor(
+      originalColor,
+      HIGHLIGHT_COLOR,
+      easedProgress,
+    );
+    applyColorToMeshes(meshes, currentColor);
+
+    if (elapsed < ANIMATION_CONFIG.FADE_IN) {
+      requestAnimationFrame(() =>
+        fadeIn(elapsed + ANIMATION_CONFIG.FRAME_INTERVAL),
+      );
+    } else {
+      setTimeout(() => {
+        fadeOut(0);
+      }, holdDuration);
+    }
+  };
+
+  const fadeOut = (elapsed: number) => {
+    const normalizedProgress = Math.min(elapsed / ANIMATION_CONFIG.FADE_OUT, 1);
+    const easedProgress = Math.pow(normalizedProgress, 3);
+    const currentColor = lerpColor(
+      HIGHLIGHT_COLOR,
+      originalColor,
+      easedProgress,
+    );
+    applyColorToMeshes(meshes, currentColor);
+
+    if (elapsed < ANIMATION_CONFIG.FADE_OUT) {
+      requestAnimationFrame(() =>
+        fadeOut(elapsed + ANIMATION_CONFIG.FRAME_INTERVAL),
+      );
+    } else {
+      onComplete?.();
+    }
+  };
+
+  // 애니메이션 시작
+  fadeIn(0);
+};
+
 const animateCameraToPart = (
   controls: CameraControls | null,
   partId: ShoePart["id"],
@@ -165,9 +244,7 @@ const animateCameraToPart = (
   if (!cameraConfig) return;
 
   const { azimuth, elevation, distance } = cameraConfig;
-
   const shoeCenter: [number, number, number] = [0, 0, 0];
-
   const cameraPosition = sphericalToCartesian(
     azimuth,
     elevation,
@@ -193,6 +270,7 @@ export const Shoes = () => {
   const { shoesColors, currentPart } = useCustomization();
 
   const cameraControlsRef = useRef<CameraControls>(null);
+  const previousPartRef = useRef<ShoePart["id"] | null>(null);
 
   useEffect(() => {
     gltf.scene.traverse((child) => {
@@ -214,12 +292,32 @@ export const Shoes = () => {
     });
   }, [gltf, shoesColors]);
 
-  // 파트 선택 시 카메라 애니메이션
+  // 파트 선택 시 하이라이트 애니메이션 및 카메라 애니메이션
   useEffect(() => {
-    if (cameraControlsRef.current && currentPart) {
-      animateCameraToPart(cameraControlsRef.current, currentPart.id);
+    if (!currentPart) return;
+
+    const currentPartId = currentPart.id;
+    const previousPartId = previousPartRef.current;
+
+    if (previousPartId !== currentPartId) {
+      const meshes = findPartMeshes(gltf.scene, currentPartId);
+
+      if (meshes.length > 0) {
+        const colorOption = COLOR_OPTIONS.find(
+          (color) => color.id === shoesColors[currentPartId],
+        );
+        const originalColor = colorOption?.color || "#FFFFFF";
+
+        highlightPartMeshes(meshes, originalColor);
+      }
+
+      if (cameraControlsRef.current) {
+        animateCameraToPart(cameraControlsRef.current, currentPartId);
+      }
+
+      previousPartRef.current = currentPartId;
     }
-  }, [currentPart]);
+  }, [currentPart, gltf.scene, shoesColors]);
 
   useEffect(() => {
     if (cameraControlsRef.current) {
