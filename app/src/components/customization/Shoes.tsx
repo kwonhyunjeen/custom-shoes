@@ -10,10 +10,11 @@ import {
   Color,
 } from "three";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import type { ShoePart } from "@/types/customization";
 import { useCustomization } from "@/contexts/CustomizationContext";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
+import { SHOE_PARTS } from "@/data/shoeParts";
 
 const PART_CAMERA_ANGLES: Record<
   ShoePart["id"],
@@ -119,6 +120,33 @@ const convertPartIdToMeshNames = (partId: ShoePart["id"]): string[] => {
     .join("_");
 
   return [`${pascalCasePartName}_Right`, `${pascalCasePartName}_Left`];
+};
+
+// 메시 이름에서 파트 ID를 역추적하는 함수
+const getPartIdFromMeshName = (meshName: string): ShoePart["id"] | null => {
+  if (!meshName) return null;
+
+  // "_Right" 또는 "_Left" 접미사 제거
+  const baseName = meshName.replace(/_(?:Right|Left)$/, "");
+
+  // PascalCase를 snake_case로 변환
+  const snakeCaseName = baseName
+    .replace(/([A-Z])/g, "_$1")
+    .toLowerCase()
+    .replace(/^_/, "") // 맨 앞의 _ 제거
+    .replace(/_+/g, "_"); // 연속된 언더스코어를 하나로 통합
+
+  console.log(
+    `Converting mesh name: ${meshName} -> ${baseName} -> ${snakeCaseName}`,
+  );
+
+  // 유효한 파트 ID인지 검증
+  const validPartIds = SHOE_PARTS.map((part) => part.id);
+  if (validPartIds.includes(snakeCaseName as ShoePart["id"])) {
+    return snakeCaseName as ShoePart["id"];
+  }
+
+  return null;
 };
 
 const findPartMeshes = (
@@ -267,18 +295,42 @@ const animateCameraToPart = (
 
 export const Shoes = () => {
   const gltf = useLoader(GLTFLoader, "/models/custom.glb");
-  const { shoesColors, currentPart } = useCustomization();
+  const { shoesColors, currentPart, selectPart } = useCustomization();
 
   const cameraControlsRef = useRef<CameraControls>(null);
   const previousPartRef = useRef<ShoePart["id"] | null>(null);
 
+  const handleMeshClick = useCallback(
+    (event: { stopPropagation: () => void; object: { name?: string } }) => {
+      event.stopPropagation();
+
+      const clickedObject = event.object;
+      if (!clickedObject || !clickedObject.name) return;
+
+      console.log("Clicked mesh name:", clickedObject.name);
+
+      const partId = getPartIdFromMeshName(clickedObject.name);
+      console.log("Converted part ID:", partId);
+
+      if (partId) {
+        selectPart(partId);
+      }
+    },
+    [selectPart],
+  );
+
   useEffect(() => {
+    const meshNames: string[] = [];
     gltf.scene.traverse((child) => {
       if (child instanceof Mesh) {
         child.castShadow = true;
         child.receiveShadow = true;
+        if (child.name) {
+          meshNames.push(child.name);
+        }
       }
     });
+    console.log("Available mesh names:", meshNames);
   }, [gltf]);
 
   useEffect(() => {
@@ -330,7 +382,11 @@ export const Shoes = () => {
     <>
       <CameraControls ref={cameraControlsRef} enabled={true} smoothTime={0.5} />
 
-      <primitive object={gltf.scene} />
+      <primitive
+        object={gltf.scene}
+        onClick={handleMeshClick}
+        onTouchStart={handleMeshClick}
+      />
     </>
   );
 };
