@@ -15,81 +15,7 @@ import type { ShoePart } from "@/types/customization";
 import { useCustomization } from "@/contexts/CustomizationContext";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
 import { SHOE_PARTS } from "@/data/shoeParts";
-
-const PART_CAMERA_ANGLES: Record<
-  ShoePart["id"],
-  {
-    azimuth: number; // 수평 회전 각도 (라디안)
-    elevation: number; // 수직 각도 (라디안)
-    distance: number; // 신발 중앙에서의 거리
-  }
-> = {
-  toe: {
-    azimuth: Math.PI / 6,
-    elevation: 0.5,
-    distance: 8,
-  },
-  vamp: {
-    azimuth: 0,
-    elevation: 0.4,
-    distance: 8,
-  },
-  mudguard: {
-    azimuth: Math.PI / 10,
-    elevation: 0.3,
-    distance: 8,
-  },
-  quarter: {
-    azimuth: Math.PI / 2.4,
-    elevation: 0.5,
-    distance: 8,
-  },
-  eyestay: {
-    azimuth: Math.PI / 3,
-    elevation: 0.3,
-    distance: 8,
-  },
-  collar: {
-    azimuth: Math.PI / 3,
-    elevation: 1,
-    distance: 8,
-  },
-  heel_counter: {
-    azimuth: Math.PI / 1.8,
-    elevation: 0.2,
-    distance: 8,
-  },
-  tongue: {
-    azimuth: 0,
-    elevation: 0.8,
-    distance: 8,
-  },
-  laces: {
-    azimuth: 0,
-    elevation: 0.6,
-    distance: 8,
-  },
-  outsole: {
-    azimuth: 0,
-    elevation: -0.8,
-    distance: 8,
-  },
-  midsole: {
-    azimuth: Math.PI / 5,
-    elevation: 0.3,
-    distance: 8,
-  },
-  insole: {
-    azimuth: 0,
-    elevation: 1.4,
-    distance: 8,
-  },
-  logo: {
-    azimuth: Math.PI / 2,
-    elevation: 0.1,
-    distance: 8,
-  },
-};
+import { PART_CAMERA_ANGLES } from "@/data/cameraAngles";
 
 const ANIMATION_CONFIG = {
   TOTAL_DURATION: 1000,
@@ -122,25 +48,18 @@ const convertPartIdToMeshNames = (partId: ShoePart["id"]): string[] => {
   return [`${pascalCasePartName}_Right`, `${pascalCasePartName}_Left`];
 };
 
-// 메시 이름에서 파트 ID를 역추적하는 함수
 const getPartIdFromMeshName = (meshName: string): ShoePart["id"] | null => {
   if (!meshName) return null;
 
-  // "_Right" 또는 "_Left" 접미사 제거
   const baseName = meshName.replace(/_(?:Right|Left)$/, "");
 
-  // PascalCase를 snake_case로 변환
   const snakeCaseName = baseName
     .replace(/([A-Z])/g, "_$1")
     .toLowerCase()
-    .replace(/^_/, "") // 맨 앞의 _ 제거
-    .replace(/_+/g, "_"); // 연속된 언더스코어를 하나로 통합
+    .replace(/^_/, "")
+    .replace(/_+/g, "_");
 
-  console.log(
-    `Converting mesh name: ${meshName} -> ${baseName} -> ${snakeCaseName}`,
-  );
-
-  // 유효한 파트 ID인지 검증
+  // 파트 검증
   const validPartIds = SHOE_PARTS.map((part) => part.id);
   if (validPartIds.includes(snakeCaseName as ShoePart["id"])) {
     return snakeCaseName as ShoePart["id"];
@@ -307,10 +226,7 @@ export const Shoes = () => {
       const clickedObject = event.object;
       if (!clickedObject || !clickedObject.name) return;
 
-      console.log("Clicked mesh name:", clickedObject.name);
-
       const partId = getPartIdFromMeshName(clickedObject.name);
-      console.log("Converted part ID:", partId);
 
       if (partId) {
         selectPart(partId);
@@ -330,7 +246,6 @@ export const Shoes = () => {
         }
       }
     });
-    console.log("Available mesh names:", meshNames);
   }, [gltf]);
 
   useEffect(() => {
