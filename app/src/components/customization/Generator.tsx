@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  useCustomization,
-  type ColorOption,
-  type ShoePart,
-} from "@/contexts/CustomizationContext";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useCustomization } from "@/contexts/CustomizationContext";
+import type { ColorOption, ShoePart } from "@/types/customization";
 
 const AIIcon = ({ className }: { className?: string }) => (
   <svg
@@ -21,8 +18,16 @@ const AIIcon = ({ className }: { className?: string }) => (
 export const Generator = () => {
   const { changePartColors } = useCustomization();
   const [isOpen, setIsOpen] = useState(false);
+  const [isFirstrun, setIsFirstrun] = useState(true);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const toggleDialog = useCallback((value: boolean) => {
+    setIsOpen(value);
+    if (value) {
+      setIsFirstrun(false);
+    }
+  }, []);
 
   const handleGenerateClick = async () => {
     if (!input.trim()) return;
@@ -49,8 +54,7 @@ export const Generator = () => {
       >;
 
       changePartColors(colors);
-      setInput("");
-      setIsOpen(false);
+      toggleDialog(false);
     } catch {
       // Handle error silently or show user notification
     } finally {
@@ -64,8 +68,7 @@ export const Generator = () => {
       void handleGenerateClick();
     }
     if (e.key === "Escape") {
-      setIsOpen(false);
-      setInput("");
+      toggleDialog(false);
     }
   };
 
@@ -79,30 +82,44 @@ export const Generator = () => {
         !containerRef.current.contains(event.target as Node) &&
         isOpen
       ) {
-        setIsOpen(false);
-        setInput("");
+        toggleDialog(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, toggleDialog]);
 
   return (
     <div className="fixed bottom-10 right-10 z-100" ref={containerRef}>
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="group relative bg-white/90 backdrop-blur-sm cursor-pointer hover:bg-white shadow-lg hover:shadow-xl p-3 rounded-full transition-all duration-300 hover:scale-110"
+        onClick={() => toggleDialog(!isOpen)}
+        className="relative rounded-full"
       >
-        <AIIcon className="w-6 h-6 text-stone-600 group-hover:text-stone-800 transition-colors animate-pulse" />
+        {isFirstrun && (
+          <>
+            <div className="absolute inset-0 rounded-full bg-sky-400/50 animate-[ripple-1_2s_infinite]" />
+            <div className="absolute inset-0 rounded-full bg-sky-500/50 animate-[ripple-2_2s_infinite]" />
+            <div className="absolute inset-0 rounded-full bg-sky-500/50 animate-[ripple-3_2s_infinite]" />
+          </>
+        )}
+        <span className="flex bg-white/90 backdrop-blur-sm cursor-pointer hover:bg-white shadow-lg hover:shadow-xl p-3 rounded-full transition-all duration-300 hover:scale-110">
+          <AIIcon className="relative w-6 h-6 text-stone-600 group-hover:text-stone-800 transition-colors z-10" />
+        </span>
       </button>
       <div
+        role="dialog"
         className={`absolute bottom-0 right-16 transition-all duration-300 ease-out ${
           isOpen
-            ? "translate-x-0 opacity-100 pointer-events-auto"
-            : "translate-x-8 opacity-0 pointer-events-none"
+            ? "translate-x-0 opacity-100 visible pointer-events-auto"
+            : "translate-x-8 opacity-0 invisible pointer-events-none"
         }`}
+        onTransitionEnd={() => {
+          if (!isOpen) {
+            console.log("asdf");
+          }
+        }}
       >
         <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-xl p-4 min-w-100 border border-white/20">
           <textarea
@@ -170,15 +187,14 @@ export const Generator = () => {
               type="button"
               onClick={() => void handleGenerateClick()}
               disabled={!input.trim() || isLoading}
-              className="flex-1 px-4 py-2 bg-stone-600 text-white rounded-md cursor-pointer hover:bg-stone-700 disabled:bg-gray-300 disabled:cursor-default transition-colors text-sm font-medium"
+              className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-md cursor-pointer hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-default transition-colors text-sm font-medium"
             >
               {isLoading ? "Generating..." : "Generate"}
             </button>
             <button
               type="button"
               onClick={() => {
-                setIsOpen(false);
-                setInput("");
+                toggleDialog(false);
               }}
               className="px-3 py-2 text-gray-500 cursor-pointer hover:text-gray-700 transition-colors text-sm"
             >
