@@ -10,7 +10,7 @@ import {
   Color,
 } from "three";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import type { ShoePart } from "@/types/customization";
 import { useCustomization } from "@/contexts/CustomizationContext";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
@@ -25,6 +25,7 @@ const ANIMATION_CONFIG = {
 } as const;
 
 const HIGHLIGHT_COLOR = "#d5e9f7";
+const CLICK_THRESHOLD = 5;
 
 // 카메라 각도(azimuth, elevation)를 3D 좌표(x, y, z)로 변환
 const sphericalToCartesian = (
@@ -219,20 +220,76 @@ export const Shoes = () => {
   const cameraControlsRef = useRef<CameraControls>(null);
   const previousPartRef = useRef<ShoePart["id"] | null>(null);
 
-  const handleMeshClick = useCallback(
-    (event: { stopPropagation: () => void; object: { name?: string } }) => {
-      event.stopPropagation();
+  const [pointerStartPos, setPointerStartPos] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-      const clickedObject = event.object;
-      if (!clickedObject || !clickedObject.name) return;
+  // 시작점 저장
+  const handlePointerDown = useCallback(
+    (event: {
+      clientX?: number;
+      clientY?: number;
+      touches?: Array<{ clientX: number; clientY: number }>;
+    }) => {
+      const clientX =
+        event.clientX || (event.touches && event.touches[0]?.clientX) || 0;
+      const clientY =
+        event.clientY || (event.touches && event.touches[0]?.clientY) || 0;
 
-      const partId = getPartIdFromMeshName(clickedObject.name);
+      setPointerStartPos({ x: clientX, y: clientY });
+      setIsDragging(false);
+    },
+    [],
+  );
 
-      if (partId) {
-        selectPart(partId);
+  // 드래그 감지
+  const handlePointerMove = useCallback(
+    (event: {
+      clientX?: number;
+      clientY?: number;
+      touches?: Array<{ clientX: number; clientY: number }>;
+    }) => {
+      if (!pointerStartPos) return;
+
+      const clientX =
+        event.clientX || (event.touches && event.touches[0]?.clientX) || 0;
+      const clientY =
+        event.clientY || (event.touches && event.touches[0]?.clientY) || 0;
+
+      const deltaX = clientX - pointerStartPos.x;
+      const deltaY = clientY - pointerStartPos.y;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      if (distance > CLICK_THRESHOLD) {
+        setIsDragging(true);
       }
     },
-    [selectPart],
+    [pointerStartPos],
+  );
+
+  // 동작 종료
+  const handlePointerUp = useCallback(
+    (event: { stopPropagation: () => void; object: { name?: string } }) => {
+      // 클릭 처리
+      if (!isDragging && pointerStartPos) {
+        event.stopPropagation();
+
+        const clickedObject = event.object;
+        if (clickedObject && clickedObject.name) {
+          const partId = getPartIdFromMeshName(clickedObject.name);
+
+          if (partId) {
+            selectPart(partId);
+          }
+        }
+      }
+
+      setPointerStartPos(null);
+      setIsDragging(false);
+    },
+    [isDragging, pointerStartPos, selectPart],
   );
 
   useEffect(() => {
@@ -293,14 +350,36 @@ export const Shoes = () => {
     }
   }, []);
 
+  useEffect(() => {
+    return () => {
+      setPointerStartPos(null);
+      setIsDragging(false);
+    };
+  }, []);
+
+  // 윈도우 포커스 잃을 때 상태 초기화
+  useEffect(() => {
+    const handleBlur = () => {
+      setPointerStartPos(null);
+      setIsDragging(false);
+    };
+
+    window.addEventListener("blur", handleBlur);
+    return () => window.removeEventListener("blur", handleBlur);
+  }, []);
+
   return (
     <>
       <CameraControls ref={cameraControlsRef} enabled={true} smoothTime={0.5} />
 
       <primitive
         object={gltf.scene}
-        onClick={handleMeshClick}
-        onTouchStart={handleMeshClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onTouchStart={handlePointerDown}
+        onTouchMove={handlePointerMove}
+        onTouchEnd={handlePointerUp}
       />
     </>
   );
