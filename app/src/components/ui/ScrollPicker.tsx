@@ -85,12 +85,12 @@ export const ScrollPicker = <T,>({
         scrollToIndex(selectedIndex, false);
         setScrollBasedIndex(selectedIndex);
         isInitializedRef.current = true;
-      } else if (selectedIndex !== currentIndex && !isScrolling) {
+      } else if (selectedIndex !== scrollBasedIndex && !isScrolling) {
         scrollToIndex(selectedIndex, true);
         setScrollBasedIndex(selectedIndex);
       }
     }
-  }, [selectedIndex, scrollToIndex, currentIndex, isScrolling]);
+  }, [selectedIndex, scrollToIndex, scrollBasedIndex, isScrolling]);
 
   const handleScroll = useCallback(
     (event: React.UIEvent<HTMLDivElement>) => {
