@@ -10,86 +10,12 @@ import {
   Color,
 } from "three";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import type { ShoePart } from "@/types/customization";
 import { useCustomization } from "@/contexts/CustomizationContext";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
 import { SHOE_PARTS } from "@/data/shoeParts";
-
-const PART_CAMERA_ANGLES: Record<
-  ShoePart["id"],
-  {
-    azimuth: number; // 수평 회전 각도 (라디안)
-    elevation: number; // 수직 각도 (라디안)
-    distance: number; // 신발 중앙에서의 거리
-  }
-> = {
-  toe: {
-    azimuth: Math.PI / 6,
-    elevation: 0.5,
-    distance: 8,
-  },
-  vamp: {
-    azimuth: 0,
-    elevation: 0.4,
-    distance: 8,
-  },
-  mudguard: {
-    azimuth: Math.PI / 10,
-    elevation: 0.3,
-    distance: 8,
-  },
-  quarter: {
-    azimuth: Math.PI / 2.4,
-    elevation: 0.5,
-    distance: 8,
-  },
-  eyestay: {
-    azimuth: Math.PI / 3,
-    elevation: 0.3,
-    distance: 8,
-  },
-  collar: {
-    azimuth: Math.PI / 3,
-    elevation: 1,
-    distance: 8,
-  },
-  heel_counter: {
-    azimuth: Math.PI / 1.8,
-    elevation: 0.2,
-    distance: 8,
-  },
-  tongue: {
-    azimuth: 0,
-    elevation: 0.8,
-    distance: 8,
-  },
-  laces: {
-    azimuth: 0,
-    elevation: 0.6,
-    distance: 8,
-  },
-  outsole: {
-    azimuth: 0,
-    elevation: -0.8,
-    distance: 8,
-  },
-  midsole: {
-    azimuth: Math.PI / 5,
-    elevation: 0.3,
-    distance: 8,
-  },
-  insole: {
-    azimuth: 0,
-    elevation: 1.4,
-    distance: 8,
-  },
-  logo: {
-    azimuth: Math.PI / 2,
-    elevation: 0.1,
-    distance: 8,
-  },
-};
+import { PART_CAMERA_ANGLES } from "@/data/cameraAngles";
 
 const ANIMATION_CONFIG = {
   TOTAL_DURATION: 1000,
@@ -99,6 +25,7 @@ const ANIMATION_CONFIG = {
 } as const;
 
 const HIGHLIGHT_COLOR = "#d5e9f7";
+const CLICK_THRESHOLD = 5;
 
 // 카메라 각도(azimuth, elevation)를 3D 좌표(x, y, z)로 변환
 const sphericalToCartesian = (
@@ -122,25 +49,18 @@ const convertPartIdToMeshNames = (partId: ShoePart["id"]): string[] => {
   return [`${pascalCasePartName}_Right`, `${pascalCasePartName}_Left`];
 };
 
-// 메시 이름에서 파트 ID를 역추적하는 함수
 const getPartIdFromMeshName = (meshName: string): ShoePart["id"] | null => {
   if (!meshName) return null;
 
-  // "_Right" 또는 "_Left" 접미사 제거
   const baseName = meshName.replace(/_(?:Right|Left)$/, "");
 
-  // PascalCase를 snake_case로 변환
   const snakeCaseName = baseName
     .replace(/([A-Z])/g, "_$1")
     .toLowerCase()
-    .replace(/^_/, "") // 맨 앞의 _ 제거
-    .replace(/_+/g, "_"); // 연속된 언더스코어를 하나로 통합
+    .replace(/^_/, "")
+    .replace(/_+/g, "_");
 
-  console.log(
-    `Converting mesh name: ${meshName} -> ${baseName} -> ${snakeCaseName}`,
-  );
-
-  // 유효한 파트 ID인지 검증
+  // 파트 검증
   const validPartIds = SHOE_PARTS.map((part) => part.id);
   if (validPartIds.includes(snakeCaseName as ShoePart["id"])) {
     return snakeCaseName as ShoePart["id"];
@@ -300,23 +220,76 @@ export const Shoes = () => {
   const cameraControlsRef = useRef<CameraControls>(null);
   const previousPartRef = useRef<ShoePart["id"] | null>(null);
 
-  const handleMeshClick = useCallback(
-    (event: { stopPropagation: () => void; object: { name?: string } }) => {
-      event.stopPropagation();
+  const [pointerStartPos, setPointerStartPos] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-      const clickedObject = event.object;
-      if (!clickedObject || !clickedObject.name) return;
+  // 시작점 저장
+  const handlePointerDown = useCallback(
+    (event: {
+      clientX?: number;
+      clientY?: number;
+      touches?: Array<{ clientX: number; clientY: number }>;
+    }) => {
+      const clientX =
+        event.clientX || (event.touches && event.touches[0]?.clientX) || 0;
+      const clientY =
+        event.clientY || (event.touches && event.touches[0]?.clientY) || 0;
 
-      console.log("Clicked mesh name:", clickedObject.name);
+      setPointerStartPos({ x: clientX, y: clientY });
+      setIsDragging(false);
+    },
+    [],
+  );
 
-      const partId = getPartIdFromMeshName(clickedObject.name);
-      console.log("Converted part ID:", partId);
+  // 드래그 감지
+  const handlePointerMove = useCallback(
+    (event: {
+      clientX?: number;
+      clientY?: number;
+      touches?: Array<{ clientX: number; clientY: number }>;
+    }) => {
+      if (!pointerStartPos) return;
 
-      if (partId) {
-        selectPart(partId);
+      const clientX =
+        event.clientX || (event.touches && event.touches[0]?.clientX) || 0;
+      const clientY =
+        event.clientY || (event.touches && event.touches[0]?.clientY) || 0;
+
+      const deltaX = clientX - pointerStartPos.x;
+      const deltaY = clientY - pointerStartPos.y;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      if (distance > CLICK_THRESHOLD) {
+        setIsDragging(true);
       }
     },
-    [selectPart],
+    [pointerStartPos],
+  );
+
+  // 동작 종료
+  const handlePointerUp = useCallback(
+    (event: { stopPropagation: () => void; object: { name?: string } }) => {
+      // 클릭 처리
+      if (!isDragging && pointerStartPos) {
+        event.stopPropagation();
+
+        const clickedObject = event.object;
+        if (clickedObject && clickedObject.name) {
+          const partId = getPartIdFromMeshName(clickedObject.name);
+
+          if (partId) {
+            selectPart(partId);
+          }
+        }
+      }
+
+      setPointerStartPos(null);
+      setIsDragging(false);
+    },
+    [isDragging, pointerStartPos, selectPart],
   );
 
   useEffect(() => {
@@ -330,7 +303,6 @@ export const Shoes = () => {
         }
       }
     });
-    console.log("Available mesh names:", meshNames);
   }, [gltf]);
 
   useEffect(() => {
@@ -378,14 +350,36 @@ export const Shoes = () => {
     }
   }, []);
 
+  useEffect(() => {
+    return () => {
+      setPointerStartPos(null);
+      setIsDragging(false);
+    };
+  }, []);
+
+  // 윈도우 포커스 잃을 때 상태 초기화
+  useEffect(() => {
+    const handleBlur = () => {
+      setPointerStartPos(null);
+      setIsDragging(false);
+    };
+
+    window.addEventListener("blur", handleBlur);
+    return () => window.removeEventListener("blur", handleBlur);
+  }, []);
+
   return (
     <>
       <CameraControls ref={cameraControlsRef} enabled={true} smoothTime={0.5} />
 
       <primitive
         object={gltf.scene}
-        onClick={handleMeshClick}
-        onTouchStart={handleMeshClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onTouchStart={handlePointerDown}
+        onTouchMove={handlePointerMove}
+        onTouchEnd={handlePointerUp}
       />
     </>
   );
