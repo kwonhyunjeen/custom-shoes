@@ -12,6 +12,7 @@ import {
 
 import { useRef, useEffect, useCallback, useState } from "react";
 import type { ShoePart } from "@/types/customization";
+import type { PointEventType } from "@/types/interaction";
 import { useCustomization } from "@/contexts/CustomizationContext";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
 import { SHOE_PARTS } from "@/data/shoeParts";
@@ -227,30 +228,19 @@ export const Shoes = () => {
   const [isDragging, setIsDragging] = useState(false);
 
   // 시작점 저장
-  const handlePointerDown = useCallback(
-    (event: {
-      clientX?: number;
-      clientY?: number;
-      touches?: Array<{ clientX: number; clientY: number }>;
-    }) => {
-      const clientX =
-        event.clientX || (event.touches && event.touches[0]?.clientX) || 0;
-      const clientY =
-        event.clientY || (event.touches && event.touches[0]?.clientY) || 0;
+  const handlePointerDown = useCallback((event: PointEventType) => {
+    const clientX =
+      event.clientX || (event.touches && event.touches[0]?.clientX) || 0;
+    const clientY =
+      event.clientY || (event.touches && event.touches[0]?.clientY) || 0;
 
-      setPointerStartPos({ x: clientX, y: clientY });
-      setIsDragging(false);
-    },
-    [],
-  );
+    setPointerStartPos({ x: clientX, y: clientY });
+    setIsDragging(false);
+  }, []);
 
   // 드래그 감지
   const handlePointerMove = useCallback(
-    (event: {
-      clientX?: number;
-      clientY?: number;
-      touches?: Array<{ clientX: number; clientY: number }>;
-    }) => {
+    (event: PointEventType) => {
       if (!pointerStartPos) return;
 
       const clientX =
