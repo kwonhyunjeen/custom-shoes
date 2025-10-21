@@ -3,19 +3,14 @@ import { useLoader } from "@react-three/fiber";
 import { CameraControls } from "@react-three/drei";
 import { Mesh, BufferGeometry, Material, Color } from "three";
 
-import { useRef, useEffect, useCallback, useState } from "react";
+import { useRef, useEffect } from "react";
 import type { ShoePart } from "@/types/customization";
-import type { PointEventType } from "@/types/interaction";
 import { useCustomization } from "@/contexts/CustomizationContext";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
 import { PART_CAMERA_ANGLES } from "@/data/cameraAngles";
-import { getClientPosition } from "@/utils/event";
-import {
-  applyColorToMeshes,
-  findPartMeshes,
-  getPartIdFromMeshName,
-} from "@/utils/mesh";
+import { applyColorToMeshes, findPartMeshes } from "@/utils/mesh";
 import { sphericalToCartesian } from "@/utils/geometry";
+import { useShoeInteraction } from "@/hooks/useShoeInteraction";
 
 const ANIMATION_CONFIG = {
   TOTAL_DURATION: 1000,
@@ -25,7 +20,6 @@ const ANIMATION_CONFIG = {
 } as const;
 
 const HIGHLIGHT_COLOR = "#d5e9f7";
-const CLICK_THRESHOLD = 5;
 
 /**
  * t값(0~1)에 따라 color1에서 color2로 점진적 색상 변화
@@ -131,64 +125,11 @@ const animateCameraToPart = (
 export const Shoes = () => {
   const gltf = useLoader(GLTFLoader, "/models/custom.glb");
   const { shoesColors, currentPart, selectPart } = useCustomization();
+  const { handlePointerDown, handlePointerMove, handlePointerUp } =
+    useShoeInteraction({ onPartSelect: selectPart });
 
   const cameraControlsRef = useRef<CameraControls>(null);
   const previousPartRef = useRef<ShoePart["id"] | null>(null);
-
-  const [pointerStartPos, setPointerStartPos] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-
-  // 시작점 저장
-  const handlePointerDown = useCallback((event: PointEventType) => {
-    const position = getClientPosition(event);
-
-    setPointerStartPos(position);
-    setIsDragging(false);
-  }, []);
-
-  // 드래그 감지
-  const handlePointerMove = useCallback(
-    (event: PointEventType) => {
-      if (!pointerStartPos) return;
-
-      const position = getClientPosition(event);
-
-      const deltaX = position.x - pointerStartPos.x;
-      const deltaY = position.y - pointerStartPos.y;
-      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-      if (distance > CLICK_THRESHOLD) {
-        setIsDragging(true);
-      }
-    },
-    [pointerStartPos],
-  );
-
-  // 동작 종료
-  const handlePointerUp = useCallback(
-    (event: { stopPropagation: () => void; object: { name?: string } }) => {
-      // 클릭 처리
-      if (!isDragging && pointerStartPos) {
-        event.stopPropagation();
-
-        const clickedObject = event.object;
-        if (clickedObject && clickedObject.name) {
-          const partId = getPartIdFromMeshName(clickedObject.name);
-
-          if (partId) {
-            selectPart(partId);
-          }
-        }
-      }
-
-      setPointerStartPos(null);
-      setIsDragging(false);
-    },
-    [isDragging, pointerStartPos, selectPart],
-  );
 
   useEffect(() => {
     const meshNames: string[] = [];
@@ -246,24 +187,6 @@ export const Shoes = () => {
       const controls = cameraControlsRef.current;
       controls.mouseButtons.wheel = 0;
     }
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      setPointerStartPos(null);
-      setIsDragging(false);
-    };
-  }, []);
-
-  // 윈도우 포커스 잃을 때 상태 초기화
-  useEffect(() => {
-    const handleBlur = () => {
-      setPointerStartPos(null);
-      setIsDragging(false);
-    };
-
-    window.addEventListener("blur", handleBlur);
-    return () => window.removeEventListener("blur", handleBlur);
   }, []);
 
   return (
