@@ -63,7 +63,7 @@ export const COLOR_OPTIONS = [
   },
   {
     id: "red",
-    color: "#C42126",
+    color: "#b33f47",
     name: "Red",
   },
   {
