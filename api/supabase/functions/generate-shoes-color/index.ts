@@ -28,7 +28,7 @@ const corsHeaders = {
 const outputSchema = z.object({
   collar: z.string(),
   eyestay: z.string(),
-  heel_counter: z.string(),
+  foxing: z.string(),
   insole: z.string(),
   laces: z.string(),
   logo: z.string(),

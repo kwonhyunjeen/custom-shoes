@@ -2,7 +2,7 @@ export interface ShoePart {
   id:
     | "collar"
     | "eyestay"
-    | "heel_counter"
+    | "foxing"
     | "insole"
     | "laces"
     | "logo"

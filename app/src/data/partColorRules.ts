@@ -40,7 +40,7 @@ export const PART_COLOR_RULES: Record<ShoePart["id"], PartColorRule> = {
     "red",
     "brown",
   ],
-  heel_counter: [
+  foxing: [
     "black",
     "gray",
     "white",

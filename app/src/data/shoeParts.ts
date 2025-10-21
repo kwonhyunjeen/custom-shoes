@@ -24,9 +24,9 @@ export const SHOE_PARTS = [
     displayName: "Midsole",
   },
   {
-    id: "heel_counter",
-    name: "Heel_Counter",
-    displayName: "Heel Counter",
+    id: "foxing",
+    name: "Foxing",
+    displayName: "Foxing",
   },
   {
     id: "quarter",

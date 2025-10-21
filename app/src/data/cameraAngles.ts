@@ -38,7 +38,7 @@ export const PART_CAMERA_ANGLES: Record<
     elevation: 1,
     distance: 8,
   },
-  heel_counter: {
+  foxing: {
     azimuth: Math.PI / 1.8,
     elevation: 0.2,
     distance: 8,
