@@ -91,7 +91,7 @@ export const Generator = () => {
   }, [isOpen, toggleDialog]);
 
   return (
-    <div className="fixed bottom-10 right-10 z-100" ref={containerRef}>
+    <div className="fixed bottom-5 right-10 z-100" ref={containerRef}>
       <button
         type="button"
         onClick={() => toggleDialog(!isOpen)}
