@@ -14,7 +14,6 @@ export const PART_COLOR_RULES: Record<ShoePart["id"], PartColorRule> = {
     "brown",
   ],
   laces: ["black", "white", "gray", "cream", "red", "navy", "brown"],
-  eyestay: ["black", "white", "gray", "brown", "navy"],
   insole: ["black", "white", "cream", "light-gray", "navy"],
   mudguard: [
     "black",

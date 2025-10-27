@@ -1,7 +1,6 @@
 export interface ShoePart {
   id:
     | "collar"
-    | "eyestay"
     | "foxing"
     | "insole"
     | "laces"

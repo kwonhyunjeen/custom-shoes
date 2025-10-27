@@ -124,6 +124,7 @@ const animateCameraToPart = (
 
 export const Shoes = () => {
   const gltf = useLoader(GLTFLoader, "/models/custom.glb");
+
   const { shoesColors, currentPart, selectPart } = useCustomization();
   const { handlePointerDown, handlePointerMove, handlePointerUp } =
     useShoeInteraction({ onPartSelect: selectPart });

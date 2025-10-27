@@ -28,11 +28,6 @@ export const PART_CAMERA_ANGLES: Record<
     elevation: 0.5,
     distance: 8,
   },
-  eyestay: {
-    azimuth: Math.PI / 3,
-    elevation: 0.3,
-    distance: 8,
-  },
   collar: {
     azimuth: Math.PI / 3,
     elevation: 1,
