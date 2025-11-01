@@ -7,11 +7,6 @@ export const SHOE_PARTS = [
     displayName: "Collar",
   },
   { id: "laces", name: "Laces", displayName: "Laces" },
-  {
-    id: "eyestay",
-    name: "Eyestay",
-    displayName: "Eyestay",
-  },
   { id: "insole", name: "Insole", displayName: "Insole" },
   {
     id: "mudguard",
@@ -24,9 +19,9 @@ export const SHOE_PARTS = [
     displayName: "Midsole",
   },
   {
-    id: "heel_counter",
-    name: "Heel_Counter",
-    displayName: "Heel Counter",
+    id: "foxing",
+    name: "Foxing",
+    displayName: "Foxing",
   },
   {
     id: "quarter",

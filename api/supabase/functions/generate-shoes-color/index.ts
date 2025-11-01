@@ -27,8 +27,7 @@ const corsHeaders = {
 // 프롬프트 토큰을 줄이기 위해 `z.union([z.literal("black"), ...])` 대신 `z.string()`로 선언
 const outputSchema = z.object({
   collar: z.string(),
-  eyestay: z.string(),
-  heel_counter: z.string(),
+  foxing: z.string(),
   insole: z.string(),
   laces: z.string(),
   logo: z.string(),

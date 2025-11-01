@@ -1,5 +1,6 @@
 import type { ColorOption } from "@/types/customization";
 import { cn } from "@/utils/className";
+import { useCallback, useId, useRef } from "react";
 
 interface ColorPaletteProps {
   className?: string;
@@ -14,18 +15,67 @@ export const ColorPalette = ({
   value,
   onChange,
 }: ColorPaletteProps) => {
-  const handleKeyDown = (event: React.KeyboardEvent, color: ColorOption) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onChange?.(color);
+  const colorGroupRef = useRef<HTMLDivElement>(null);
+  const groupId = useId();
+  const lableId = useId();
+
+  const currentIndex = colors.findIndex((color) => color.id === value.id);
+
+  const focusColorAt = useCallback((index: number) => {
+    const colorButtons =
+      colorGroupRef.current?.querySelectorAll('[role="radio"]');
+    if (colorButtons && colorButtons[index]) {
+      (colorButtons[index] as HTMLElement).focus();
     }
-  };
+  }, []);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      const { key } = event;
+      let newIndex = currentIndex;
+
+      switch (key) {
+        case "ArrowRight":
+        case "ArrowDown":
+          event.preventDefault();
+          newIndex = currentIndex < colors.length - 1 ? currentIndex + 1 : 0;
+          onChange?.(colors[newIndex]);
+          setTimeout(() => focusColorAt(newIndex), 0);
+          break;
+        case "ArrowLeft":
+        case "ArrowUp":
+          event.preventDefault();
+          newIndex = currentIndex > 0 ? currentIndex - 1 : colors.length - 1;
+          onChange?.(colors[newIndex]);
+          setTimeout(() => focusColorAt(newIndex), 0);
+          break;
+        case "Home":
+          event.preventDefault();
+          onChange?.(colors[0]);
+          setTimeout(() => focusColorAt(0), 0);
+          break;
+        case "End":
+          event.preventDefault();
+          onChange?.(colors[colors.length - 1]);
+          setTimeout(() => focusColorAt(colors.length - 1), 0);
+          break;
+        case "Enter":
+        case " ":
+          event.preventDefault();
+          break;
+      }
+    },
+    [currentIndex, colors, onChange, focusColorAt],
+  );
 
   return (
     <div className={cn("flex flex-col gap-4 items-center", className)}>
       <div
+        ref={colorGroupRef}
         className="overflow-y-auto grow scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2 scroll-smooth"
-        role="group"
+        role="radiogroup"
+        aria-labelledby={lableId}
+        onKeyDown={handleKeyDown}
       >
         <div className="flex flex-wrap w-fit">
           {colors.map((color) => {
@@ -38,11 +88,11 @@ export const ColorPalette = ({
                 ${isSelected ? "" : "hover:scale-103"}
               `}
                 onClick={() => onChange?.(color)}
-                onKeyDown={(e) => handleKeyDown(e, color)}
-                aria-label={`Select ${color.name} color`}
-                aria-pressed={isSelected}
                 role="radio"
                 aria-checked={isSelected}
+                tabIndex={isSelected ? 0 : -1}
+                aria-label={`Select ${color.name} color`}
+                aria-describedby={`${groupId}-${color.id}-desc`}
               >
                 <div className="flex flex-col items-center">
                   <div
@@ -56,11 +106,15 @@ export const ColorPalette = ({
                   `}
                     style={{ backgroundColor: color.color }}
                   />
+                  {isSelected && (
+                    <div className="absolute inset-0 rounded-xl pointer-events-none" />
+                  )}
                 </div>
 
-                {isSelected && (
-                  <div className="absolute inset-0 rounded-xl pointer-events-none" />
-                )}
+                {/* 스크린 리더 */}
+                <div id={`${groupId}-${color.id}-desc`} className="sr-only">
+                  {isSelected ? "Currently selected" : "Not selected"}
+                </div>
               </button>
             );
           })}

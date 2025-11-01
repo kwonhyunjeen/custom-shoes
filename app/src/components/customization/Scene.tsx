@@ -1,11 +1,41 @@
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
+import * as THREE from "three";
 
 interface SceneProps {
   children: ReactNode;
+  isPanelCollapsed?: boolean;
 }
 
-export const Scene = ({ children }: SceneProps) => {
+// 카메라 FOV 애니메이션
+const CameraController = ({
+  isPanelCollapsed,
+}: {
+  isPanelCollapsed: boolean;
+}) => {
+  const targetFovRef = useRef(12);
+  const currentFovRef = useRef(12);
+
+  useEffect(() => {
+    targetFovRef.current = isPanelCollapsed ? 10 : 12;
+  }, [isPanelCollapsed]);
+
+  useFrame(({ camera }) => {
+    if (camera instanceof THREE.PerspectiveCamera) {
+      const diff = targetFovRef.current - currentFovRef.current;
+      if (Math.abs(diff) > 0.01) {
+        currentFovRef.current += diff * 0.1;
+        camera.fov = currentFovRef.current;
+        camera.updateProjectionMatrix();
+      }
+    }
+  });
+
+  return null;
+};
+
+export const Scene = ({ children, isPanelCollapsed = false }: SceneProps) => {
   return (
     <Canvas
       camera={{ position: [4, 3, 5], fov: 12 }}
@@ -68,6 +98,7 @@ export const Scene = ({ children }: SceneProps) => {
         <shadowMaterial opacity={0.15} />
       </mesh>
 
+      <CameraController isPanelCollapsed={isPanelCollapsed} />
       {children}
     </Canvas>
   );
