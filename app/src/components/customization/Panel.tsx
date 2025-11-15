@@ -90,10 +90,12 @@ export const Panel = ({
     changePartColor,
     selectPart,
     getAvailableColors,
+    isHighlighting,
   } = useCustomization();
   const availableColors = getAvailableColors();
 
   const handleColorSelect = (color: ColorOption) => {
+    if (isHighlighting) return;
     changePartColor(color.id);
   };
 

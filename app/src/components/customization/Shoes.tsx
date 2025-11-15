@@ -125,7 +125,8 @@ const animateCameraToPart = (
 export const Shoes = () => {
   const gltf = useLoader(GLTFLoader, "/models/custom.glb");
 
-  const { shoesColors, currentPart, selectPart } = useCustomization();
+  const { shoesColors, currentPart, selectPart, setIsHighlighting } =
+    useCustomization();
   const { handlePointerDown, handlePointerMove, handlePointerUp } =
     useShoeInteraction({ onPartSelect: selectPart });
 
@@ -172,7 +173,10 @@ export const Shoes = () => {
         );
         const originalColor = colorOption?.color || "#FFFFFF";
 
-        highlightPartMeshes(meshes, originalColor);
+        setIsHighlighting(true);
+        highlightPartMeshes(meshes, originalColor, () => {
+          setIsHighlighting(false);
+        });
       }
 
       if (cameraControlsRef.current) {
@@ -181,7 +185,7 @@ export const Shoes = () => {
 
       previousPartRef.current = currentPartId;
     }
-  }, [currentPart, gltf.scene, shoesColors]);
+  }, [currentPart, gltf.scene, shoesColors, setIsHighlighting]);
 
   useEffect(() => {
     if (cameraControlsRef.current) {
