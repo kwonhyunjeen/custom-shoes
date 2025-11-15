@@ -21,11 +21,15 @@ export const Generator = () => {
   const [isFirstrun, setIsFirstrun] = useState(true);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const toggleDialog = useCallback((value: boolean) => {
     setIsOpen(value);
     if (value) {
       setIsFirstrun(false);
+    } else {
+      // 다이얼로그가 닫힐 때 입력값 초기화
+      setInput("");
     }
   }, []);
 
@@ -115,21 +119,21 @@ export const Generator = () => {
             ? "translate-x-0 opacity-100 visible pointer-events-auto"
             : "translate-x-8 opacity-0 invisible pointer-events-none"
         }`}
-        onTransitionEnd={() => {
-          if (!isOpen) {
-            console.log("asdf");
+        onTransitionStart={() => {
+          if (isOpen && textareaRef.current) {
+            textareaRef.current.focus();
           }
         }}
       >
         <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-xl p-4 min-w-100 border border-white/20">
           <textarea
+            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Describe your shoe design..."
             className="w-full h-20 p-3 border border-gray-200 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
             disabled={isLoading}
-            autoFocus={isOpen}
           />
           <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
             <div className="flex items-center gap-2 mb-2">
