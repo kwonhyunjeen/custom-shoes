@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useCustomization } from "@/contexts/CustomizationContext";
 import type { ColorOption, ShoePart } from "@/types/customization";
+import type { ApiError } from "@/types/api";
+import { getValidShoePartIds } from "@/utils/mesh";
 
 const AIIcon = ({ className }: { className?: string }) => (
   <svg
@@ -21,6 +23,7 @@ export const Generator = () => {
   const [isFirstrun, setIsFirstrun] = useState(true);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<ApiError | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const toggleDialog = useCallback((value: boolean) => {
@@ -28,8 +31,8 @@ export const Generator = () => {
     if (value) {
       setIsFirstrun(false);
     } else {
-      // 다이얼로그가 닫힐 때 입력값 초기화
       setInput("");
+      setError(null);
     }
   }, []);
 
@@ -37,6 +40,11 @@ export const Generator = () => {
     if (!input.trim()) return;
 
     setIsLoading(true);
+    setError(null);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       const response = await fetch(
         "http://127.0.0.1:54321/functions/v1/generate-shoes-color",
@@ -49,18 +57,72 @@ export const Generator = () => {
           body: JSON.stringify({
             message: input,
           }),
+          signal: controller.signal,
         },
       );
 
-      const colors = (await response.json()) as Record<
-        ShoePart["id"],
-        ColorOption["id"]
-      >;
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        setError({
+          type: "server",
+          message:
+            "An error occurred while processing the request. Please try again.",
+        });
+        return;
+      }
+
+      // JSON 파싱 및 데이터 검증
+      let colors: Record<ShoePart["id"], ColorOption["id"]>;
+      try {
+        colors = (await response.json()) as Record<
+          ShoePart["id"],
+          ColorOption["id"]
+        >;
+
+        if (!colors || typeof colors !== "object" || Array.isArray(colors)) {
+          throw new Error("Invalid response format");
+        }
+
+        const validShoePartIds = getValidShoePartIds();
+        const validKeys = Object.keys(colors).filter((key) =>
+          validShoePartIds.includes(key as ShoePart["id"]),
+        );
+        if (validKeys.length === 0) {
+          throw new Error("Invalid response format");
+        }
+      } catch {
+        setError({
+          type: "data",
+          message: "Unable to process the response. Please try again.",
+        });
+        return;
+      }
 
       changePartColors(colors);
       toggleDialog(false);
-    } catch {
-      // Handle error silently or show user notification
+    } catch (err) {
+      clearTimeout(timeoutId);
+
+      if (err instanceof Error) {
+        if (err.name === "AbortError") {
+          setError({
+            type: "network",
+            message: "Request timed out. Please try again.",
+          });
+        } else {
+          setError({
+            type: "network",
+            message:
+              "Unable to connect to the server. Please check your network.",
+          });
+        }
+      } else {
+        setError({
+          type: "network",
+          message: "An unknown error occurred.",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -186,6 +248,31 @@ export const Generator = () => {
               </div>
             </div>
           </div>
+          {error && (
+            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-start gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div className="flex-1">
+                  <p className="text-sm text-red-700 font-medium">
+                    {error.message}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="flex gap-2 mt-3">
             <button
               type="button"
@@ -193,7 +280,7 @@ export const Generator = () => {
               disabled={!input.trim() || isLoading}
               className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-md cursor-pointer hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-default transition-colors text-sm font-medium"
             >
-              {isLoading ? "Generating..." : "Generate"}
+              {isLoading ? "Generating..." : error ? "Retry" : "Generate"}
             </button>
             <button
               type="button"
