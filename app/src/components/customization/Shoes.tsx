@@ -14,8 +14,8 @@ import { useShoeInteraction } from "@/hooks/useShoeInteraction";
 interface ShoesProps {
   shoesColors: Record<ShoePart["id"], ColorOption["id"]>;
   currentPart: ShoePart;
-  selectPart: (partId: ShoePart["id"]) => void;
-  setIsHighlighting: (isHighlighting: boolean) => void;
+  onPartSelect?: (partId: ShoePart["id"]) => void;
+  onHighlightingChange?: (isHighlighting: boolean) => void;
 }
 
 const ANIMATION_CONFIG = {
@@ -128,16 +128,18 @@ const animateCameraToPart = (
     );
 };
 
+const defaultOnPartSelect = () => {};
+
 export const Shoes = ({
   shoesColors,
   currentPart,
-  selectPart,
-  setIsHighlighting,
+  onPartSelect,
+  onHighlightingChange,
 }: ShoesProps) => {
   const gltf = useLoader(GLTFLoader, "/models/custom.glb");
 
   const { handlePointerDown, handlePointerMove, handlePointerUp } =
-    useShoeInteraction({ onPartSelect: selectPart });
+    useShoeInteraction({ onPartSelect: onPartSelect ?? defaultOnPartSelect });
 
   const cameraControlsRef = useRef<CameraControls>(null);
   const previousPartRef = useRef<ShoePart["id"] | null>(null);
@@ -182,9 +184,9 @@ export const Shoes = ({
         );
         const originalColor = colorOption?.color || "#FFFFFF";
 
-        setIsHighlighting(true);
+        onHighlightingChange?.(true);
         highlightPartMeshes(meshes, originalColor, () => {
-          setIsHighlighting(false);
+          onHighlightingChange?.(false);
         });
       }
 
@@ -194,7 +196,7 @@ export const Shoes = ({
 
       previousPartRef.current = currentPartId;
     }
-  }, [currentPart, gltf.scene, shoesColors, setIsHighlighting]);
+  }, [currentPart, gltf.scene, shoesColors, onHighlightingChange]);
 
   useEffect(() => {
     if (cameraControlsRef.current) {
