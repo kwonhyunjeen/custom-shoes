@@ -59,9 +59,9 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
       if (!response.ok) throw new ResponseError(response);
 
       const colorByPartIdDict = (await response.json()) as z.infer<
-        typeof PART_COLOR_RULES_SCHEMA
+        ReturnType<(typeof PART_COLOR_RULES_SCHEMA)["partial"]>
       >;
-      PART_COLOR_RULES_SCHEMA.parse(colorByPartIdDict);
+      PART_COLOR_RULES_SCHEMA.partial().parse(colorByPartIdDict);
 
       changePartColors(colorByPartIdDict);
       toggleDialog(false);
