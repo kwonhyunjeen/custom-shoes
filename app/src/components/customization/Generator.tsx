@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import type { ColorOption, ShoePart } from "@/types/customization";
-import { getValidShoePartIds } from "@/utils/mesh";
 import { MagicIcon } from "../ui/Icon";
 import { ResponseError } from "@/utils/response";
+import { PART_COLOR_RULES_SCHEMA } from "@/data/partColorRules";
+import z from "zod";
 
 interface GeneratorProps {
   changePartColors: (
@@ -57,33 +58,10 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
 
       if (!response.ok) throw new ResponseError(response);
 
-      // JSON 파싱 및 데이터 검증
-      let colorByPartIdDict: Record<ShoePart["id"], ColorOption["id"]>;
-      try {
-        colorByPartIdDict = (await response.json()) as Record<
-          ShoePart["id"],
-          ColorOption["id"]
-        >;
-
-        if (
-          !colorByPartIdDict ||
-          typeof colorByPartIdDict !== "object" ||
-          Array.isArray(colorByPartIdDict)
-        ) {
-          throw new Error("Invalid response format");
-        }
-
-        const shoePartIdSet = new Set(getValidShoePartIds());
-        const validShoePartIds = Object.keys(colorByPartIdDict).filter((key) =>
-          shoePartIdSet.has(key as ShoePart["id"]),
-        );
-        if (validShoePartIds.length === 0) {
-          throw new Error("Invalid response format");
-        }
-      } catch {
-        setErrorMessage("Unable to process the response. Please try again.");
-        return;
-      }
+      const colorByPartIdDict = (await response.json()) as z.infer<
+        typeof PART_COLOR_RULES_SCHEMA
+      >;
+      PART_COLOR_RULES_SCHEMA.parse(colorByPartIdDict);
 
       changePartColors(colorByPartIdDict);
       toggleDialog(false);
@@ -97,6 +75,12 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
       if (err instanceof ResponseError) {
         return setErrorMessage(
           "An error occurred while processing the request. Please try again.",
+        );
+      }
+
+      if (err instanceof z.ZodError) {
+        return setErrorMessage(
+          "Unable to process the response. Please try again.",
         );
       }
 

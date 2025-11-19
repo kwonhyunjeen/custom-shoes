@@ -10,6 +10,7 @@ import { PART_COLOR_RULES } from "@/data/partColorRules";
 import { ColorPalette } from "../ui/ColorPalette";
 import { ChevronLeftIcon, ChevronRightIcon } from "../ui/Icon";
 import { ScrollPicker } from "../ui/ScrollPicker";
+import { nonNullable } from "@/utils/typeGuard";
 
 export const ShoeCustomizer = () => {
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
@@ -71,13 +72,11 @@ export const ShoeCustomizer = () => {
   );
 
   const getAvailableColors = useCallback(() => {
-    const rule = PART_COLOR_RULES[currentPartId];
+    const colorIds = PART_COLOR_RULES[currentPartId];
 
-    if (rule === "all") {
-      return COLOR_OPTIONS;
-    }
-
-    return COLOR_OPTIONS.filter((color) => rule.includes(color.id));
+    return colorIds
+      .map((color) => COLOR_OPTIONS.find((option) => option.id === color))
+      .filter(nonNullable);
   }, [currentPartId]);
 
   // const resetPartColor = useCallback(() => {

@@ -1,10 +1,10 @@
 {
   "imports": {
-    "@langchain/cerebras": "npm:@langchain/cerebras@0.0.2",
-    "@langchain/core": "npm:@langchain/core@0.3.64",
-    "@langchain/core/output_parsers": "npm:@langchain/core@0.3.64/output_parsers",
-    "@langchain/core/prompts": "npm:@langchain/core@0.3.64/prompts",
-    "@langchain/core/runnables": "npm:@langchain/core@0.3.64/runnables",
-    "zod": "npm:zod@4.0.5"
+    "@langchain/cerebras": "npm:@langchain/cerebras@1.0.0",
+    "@langchain/core": "npm:@langchain/core@1.0.6",
+    "@langchain/core/output_parsers": "npm:@langchain/core@1.0.6/output_parsers",
+    "@langchain/core/prompts": "npm:@langchain/core@1.0.6/prompts",
+    "@langchain/core/runnables": "npm:@langchain/core@1.0.6/runnables",
+    "zod": "npm:zod@4.1.12"
   }
 }
