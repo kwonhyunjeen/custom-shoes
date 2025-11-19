@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import type { ColorOption, ShoePart } from "@/types/customization";
-import type { ApiError } from "@/types/api";
 import { getValidShoePartIds } from "@/utils/mesh";
 import { MagicIcon } from "../ui/Icon";
+import { ResponseError } from "@/utils/response";
 
 interface GeneratorProps {
   changePartColors: (
@@ -15,7 +15,7 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
   const [isFirstrun, setIsFirstrun] = useState(true);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<ApiError | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const toggleDialog = useCallback((value: boolean) => {
@@ -24,7 +24,7 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
       setIsFirstrun(false);
     } else {
       setInput("");
-      setError(null);
+      setErrorMessage(null);
     }
   }, []);
 
@@ -32,7 +32,7 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
     if (!input.trim()) return;
 
     setIsLoading(true);
-    setError(null);
+    setErrorMessage(null);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -55,66 +55,58 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
 
       clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        setError({
-          type: "server",
-          message:
-            "An error occurred while processing the request. Please try again.",
-        });
-        return;
-      }
+      if (!response.ok) throw new ResponseError(response);
 
       // JSON 파싱 및 데이터 검증
-      let colors: Record<ShoePart["id"], ColorOption["id"]>;
+      let colorByPartIdDict: Record<ShoePart["id"], ColorOption["id"]>;
       try {
-        colors = (await response.json()) as Record<
+        colorByPartIdDict = (await response.json()) as Record<
           ShoePart["id"],
           ColorOption["id"]
         >;
 
-        if (!colors || typeof colors !== "object" || Array.isArray(colors)) {
+        if (
+          !colorByPartIdDict ||
+          typeof colorByPartIdDict !== "object" ||
+          Array.isArray(colorByPartIdDict)
+        ) {
           throw new Error("Invalid response format");
         }
 
-        const validShoePartIds = getValidShoePartIds();
-        const validKeys = Object.keys(colors).filter((key) =>
-          validShoePartIds.includes(key as ShoePart["id"]),
+        const shoePartIdSet = new Set(getValidShoePartIds());
+        const validShoePartIds = Object.keys(colorByPartIdDict).filter((key) =>
+          shoePartIdSet.has(key as ShoePart["id"]),
         );
-        if (validKeys.length === 0) {
+        if (validShoePartIds.length === 0) {
           throw new Error("Invalid response format");
         }
       } catch {
-        setError({
-          type: "data",
-          message: "Unable to process the response. Please try again.",
-        });
+        setErrorMessage("Unable to process the response. Please try again.");
         return;
       }
 
-      changePartColors(colors);
+      changePartColors(colorByPartIdDict);
       toggleDialog(false);
     } catch (err) {
       clearTimeout(timeoutId);
 
-      if (err instanceof Error) {
-        if (err.name === "AbortError") {
-          setError({
-            type: "network",
-            message: "Request timed out. Please try again.",
-          });
-        } else {
-          setError({
-            type: "network",
-            message:
-              "Unable to connect to the server. Please check your network.",
-          });
-        }
-      } else {
-        setError({
-          type: "network",
-          message: "An unknown error occurred.",
-        });
+      if (!(err instanceof Error)) {
+        return setErrorMessage("An unknown error occurred.");
       }
+
+      if (err instanceof ResponseError) {
+        return setErrorMessage(
+          "An error occurred while processing the request. Please try again.",
+        );
+      }
+
+      if (err.name === "AbortError") {
+        return setErrorMessage("Request timed out. Please try again.");
+      }
+
+      setErrorMessage(
+        "Unable to connect to the server. Please check your network.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -226,7 +218,7 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
               </div>
             </div>
           </div>
-          {error && (
+          {errorMessage && (
             <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
               <div className="flex items-start gap-2">
                 <svg
@@ -245,7 +237,7 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
                 </svg>
                 <div className="flex-1">
                   <p className="text-sm text-red-700 font-medium">
-                    {error.message}
+                    {errorMessage}
                   </p>
                 </div>
               </div>
@@ -258,7 +250,11 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
               disabled={!input.trim() || isLoading}
               className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-md cursor-pointer hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-default transition-colors text-sm font-medium"
             >
-              {isLoading ? "Generating..." : error ? "Retry" : "Generate"}
+              {isLoading
+                ? "Generating..."
+                : errorMessage
+                  ? "Retry"
+                  : "Generate"}
             </button>
             <button
               type="button"
