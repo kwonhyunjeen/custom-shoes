@@ -4,13 +4,19 @@ import { CameraControls } from "@react-three/drei";
 import { Mesh, BufferGeometry, Material, Color } from "three";
 
 import { useRef, useEffect } from "react";
-import type { ShoePart } from "@/types/customization";
-import { useCustomization } from "@/contexts/CustomizationContext";
+import type { ColorOption, ShoePart } from "@/types/customization";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
 import { PART_CAMERA_ANGLES } from "@/data/cameraAngles";
 import { applyColorToMeshes, findPartMeshes } from "@/utils/mesh";
 import { sphericalToCartesian } from "@/utils/geometry";
 import { useShoeInteraction } from "@/hooks/useShoeInteraction";
+
+interface ShoesProps {
+  shoesColors: Record<ShoePart["id"], ColorOption["id"]>;
+  currentPart: ShoePart;
+  selectPart: (partId: ShoePart["id"]) => void;
+  setIsHighlighting: (isHighlighting: boolean) => void;
+}
 
 const ANIMATION_CONFIG = {
   TOTAL_DURATION: 1000,
@@ -122,11 +128,14 @@ const animateCameraToPart = (
     );
 };
 
-export const Shoes = () => {
+export const Shoes = ({
+  shoesColors,
+  currentPart,
+  selectPart,
+  setIsHighlighting,
+}: ShoesProps) => {
   const gltf = useLoader(GLTFLoader, "/models/custom.glb");
 
-  const { shoesColors, currentPart, selectPart, setIsHighlighting } =
-    useCustomization();
   const { handlePointerDown, handlePointerMove, handlePointerUp } =
     useShoeInteraction({ onPartSelect: selectPart });
 

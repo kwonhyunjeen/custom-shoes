@@ -1,7 +1,6 @@
 import { memo } from "react";
 import type { ColorOption, ShoePart } from "@/types/customization";
 import { ScrollPicker } from "@/components/ui/ScrollPicker";
-import { useCustomization } from "@/contexts/CustomizationContext";
 import { SHOE_PARTS } from "@/data/shoeParts";
 import { ColorPalette } from "@/components/ui/ColorPalette";
 
@@ -9,6 +8,12 @@ interface PanelProps {
   disabled?: boolean;
   isCollapsed?: boolean;
   onCollapseChange?: (collapsed: boolean) => void;
+  currentPartColor: ColorOption;
+  currentPart: ShoePart;
+  changePartColor: (colorId: ColorOption["id"]) => void;
+  selectPart: (partId: ShoePart["id"]) => void;
+  getAvailableColors: () => ColorOption[];
+  isHighlighting: boolean;
 }
 
 const ChevronDownIcon = memo(({ className }: { className?: string }) => (
@@ -83,15 +88,13 @@ export const Panel = ({
   disabled = false,
   isCollapsed = false,
   onCollapseChange,
+  currentPartColor,
+  currentPart,
+  changePartColor,
+  selectPart,
+  getAvailableColors,
+  isHighlighting,
 }: PanelProps) => {
-  const {
-    currentPartColor,
-    currentPart,
-    changePartColor,
-    selectPart,
-    getAvailableColors,
-    isHighlighting,
-  } = useCustomization();
   const availableColors = getAvailableColors();
 
   const handleColorSelect = (color: ColorOption) => {

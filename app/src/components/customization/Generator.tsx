@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useCustomization } from "@/contexts/CustomizationContext";
 import type { ColorOption, ShoePart } from "@/types/customization";
 import type { ApiError } from "@/types/api";
 import { getValidShoePartIds } from "@/utils/mesh";
+
+interface GeneratorProps {
+  changePartColors: (
+    colors: Partial<Record<ShoePart["id"], ColorOption["id"]>>,
+  ) => void;
+}
 
 const AIIcon = ({ className }: { className?: string }) => (
   <svg
@@ -17,8 +22,7 @@ const AIIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export const Generator = () => {
-  const { changePartColors } = useCustomization();
+export const Generator = ({ changePartColors }: GeneratorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isFirstrun, setIsFirstrun] = useState(true);
   const [input, setInput] = useState("");
