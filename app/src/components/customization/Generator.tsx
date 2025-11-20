@@ -1,31 +1,31 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useCustomization } from "@/contexts/CustomizationContext";
 import type { ColorOption, ShoePart } from "@/types/customization";
+import { MagicIcon } from "../ui/Icon";
+import { ResponseError } from "@/utils/response";
+import { PART_COLOR_RULES_SCHEMA } from "@/data/partColorRules";
+import z from "zod";
 
-const AIIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    height="24px"
-    viewBox="0 -960 960 960"
-    width="24px"
-    fill="currentColor"
-    className={className}
-  >
-    <path d="m176-120-56-56 301-302-181-45 198-123-17-234 179 151 216-88-87 217 151 178-234-16-124 198-45-181-301 301Zm24-520-80-80 80-80 80 80-80 80Zm355 197 48-79 93 7-60-71 35-86-86 35-71-59 7 92-79 49 90 22 23 90Zm165 323-80-80 80-80 80 80-80 80ZM569-570Z" />
-  </svg>
-);
+interface GeneratorProps {
+  changePartColors: (
+    colors: Partial<Record<ShoePart["id"], ColorOption["id"]>>,
+  ) => void;
+}
 
-export const Generator = () => {
-  const { changePartColors } = useCustomization();
+export const Generator = ({ changePartColors }: GeneratorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isFirstrun, setIsFirstrun] = useState(true);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const toggleDialog = useCallback((value: boolean) => {
     setIsOpen(value);
     if (value) {
       setIsFirstrun(false);
+    } else {
+      setInput("");
+      setErrorMessage(null);
     }
   }, []);
 
@@ -33,6 +33,11 @@ export const Generator = () => {
     if (!input.trim()) return;
 
     setIsLoading(true);
+    setErrorMessage(null);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       const response = await fetch(
         "http://127.0.0.1:54321/functions/v1/generate-shoes-color",
@@ -45,18 +50,47 @@ export const Generator = () => {
           body: JSON.stringify({
             message: input,
           }),
+          signal: controller.signal,
         },
       );
 
-      const colors = (await response.json()) as Record<
-        ShoePart["id"],
-        ColorOption["id"]
-      >;
+      clearTimeout(timeoutId);
 
-      changePartColors(colors);
+      if (!response.ok) throw new ResponseError(response);
+
+      const colorByPartIdDict = (await response.json()) as z.infer<
+        ReturnType<(typeof PART_COLOR_RULES_SCHEMA)["partial"]>
+      >;
+      PART_COLOR_RULES_SCHEMA.partial().parse(colorByPartIdDict);
+
+      changePartColors(colorByPartIdDict);
       toggleDialog(false);
-    } catch {
-      // Handle error silently or show user notification
+    } catch (err) {
+      clearTimeout(timeoutId);
+
+      if (!(err instanceof Error)) {
+        return setErrorMessage("An unknown error occurred.");
+      }
+
+      if (err instanceof ResponseError) {
+        return setErrorMessage(
+          "An error occurred while processing the request. Please try again.",
+        );
+      }
+
+      if (err instanceof z.ZodError) {
+        return setErrorMessage(
+          "Unable to process the response. Please try again.",
+        );
+      }
+
+      if (err.name === "AbortError") {
+        return setErrorMessage("Request timed out. Please try again.");
+      }
+
+      setErrorMessage(
+        "Unable to connect to the server. Please check your network.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +139,7 @@ export const Generator = () => {
           </>
         )}
         <span className="flex bg-white/90 backdrop-blur-sm cursor-pointer hover:bg-white shadow-lg hover:shadow-xl p-3 rounded-full transition-all duration-300 hover:scale-110">
-          <AIIcon className="relative w-6 h-6 text-stone-600 group-hover:text-stone-800 transition-colors z-10" />
+          <MagicIcon className="relative w-6 h-6 text-stone-600 group-hover:text-stone-800 transition-colors z-10" />
         </span>
       </button>
       <div
@@ -115,38 +149,24 @@ export const Generator = () => {
             ? "translate-x-0 opacity-100 visible pointer-events-auto"
             : "translate-x-8 opacity-0 invisible pointer-events-none"
         }`}
-        onTransitionEnd={() => {
-          if (!isOpen) {
-            console.log("asdf");
+        onTransitionStart={() => {
+          if (isOpen && textareaRef.current) {
+            textareaRef.current.focus();
           }
         }}
       >
         <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-xl p-4 min-w-100 border border-white/20">
           <textarea
+            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Describe your shoe design..."
             className="w-full h-20 p-3 border border-gray-200 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
             disabled={isLoading}
-            autoFocus={isOpen}
           />
           <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
             <div className="flex items-center gap-2 mb-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4 text-stone-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                />
-              </svg>
               <span className="text-xs font-semibold text-stone-600">예시</span>
             </div>
             <div className="grid grid-cols-1 gap-2 text-xs">
@@ -182,6 +202,31 @@ export const Generator = () => {
               </div>
             </div>
           </div>
+          {errorMessage && (
+            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-start gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div className="flex-1">
+                  <p className="text-sm text-red-700 font-medium">
+                    {errorMessage}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="flex gap-2 mt-3">
             <button
               type="button"
@@ -189,7 +234,11 @@ export const Generator = () => {
               disabled={!input.trim() || isLoading}
               className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-md cursor-pointer hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-default transition-colors text-sm font-medium"
             >
-              {isLoading ? "Generating..." : "Generate"}
+              {isLoading
+                ? "Generating..."
+                : errorMessage
+                  ? "Retry"
+                  : "Generate"}
             </button>
             <button
               type="button"

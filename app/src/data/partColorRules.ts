@@ -1,8 +1,9 @@
 import type { ShoePart, ColorOption } from "@/types/customization";
+import z from "zod";
 
-export type PartColorRule = ColorOption["id"][] | "all";
+export type PartColorRule = ColorOption["id"][];
 
-export const PART_COLOR_RULES: Record<ShoePart["id"], PartColorRule> = {
+export const PART_COLOR_RULES = {
   collar: [
     "black",
     "white",
@@ -52,7 +53,27 @@ export const PART_COLOR_RULES: Record<ShoePart["id"], PartColorRule> = {
     "pink",
     "red",
   ],
-  quarter: "all",
+  quarter: [
+    "black",
+    "gray",
+    "white",
+    "cream",
+    "light-gray",
+    "golden",
+    "olive",
+    "dark-green",
+    "royal-blue",
+    "navy",
+    "pink",
+    "burgundy",
+    "red",
+    "orange",
+    "purple",
+    "teal",
+    "brown",
+    "coral",
+    "cocoa",
+  ],
   logo: [
     "black",
     "gray",
@@ -103,4 +124,27 @@ export const PART_COLOR_RULES: Record<ShoePart["id"], PartColorRule> = {
     "pink",
     "red",
   ],
-} as const;
+} as const satisfies Record<ShoePart["id"], PartColorRule>;
+
+const createColorZodUnion = <T extends readonly string[]>(colors: T) => {
+  const [first, ...rest] = colors;
+  return z.union([
+    z.literal(first),
+    ...rest.map((color) => z.literal(color)),
+  ]) as z.ZodUnion<[z.ZodLiteral<T[0]>, ...Array<z.ZodLiteral<T[number]>>]>;
+};
+
+export const PART_COLOR_RULES_SCHEMA = z.object({
+  collar: createColorZodUnion(PART_COLOR_RULES.collar),
+  laces: createColorZodUnion(PART_COLOR_RULES.laces),
+  insole: createColorZodUnion(PART_COLOR_RULES.insole),
+  mudguard: createColorZodUnion(PART_COLOR_RULES.mudguard),
+  midsole: createColorZodUnion(PART_COLOR_RULES.midsole),
+  foxing: createColorZodUnion(PART_COLOR_RULES.foxing),
+  quarter: createColorZodUnion(PART_COLOR_RULES.quarter),
+  logo: createColorZodUnion(PART_COLOR_RULES.logo),
+  outsole: createColorZodUnion(PART_COLOR_RULES.outsole),
+  toe: createColorZodUnion(PART_COLOR_RULES.toe),
+  tongue: createColorZodUnion(PART_COLOR_RULES.tongue),
+  vamp: createColorZodUnion(PART_COLOR_RULES.vamp),
+});

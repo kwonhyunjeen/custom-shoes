@@ -47,6 +47,7 @@ export interface CustomizationContextType {
   shoesColors: Record<ShoePart["id"], ColorOption["id"]>;
   currentPart: ShoePart;
   currentPartColor: ColorOption;
+  isHighlighting: boolean;
   selectPart: (part: ShoePart["id"]) => void;
   changePartColor: (color: ColorOption["id"]) => void;
   changePartColors: (
@@ -54,4 +55,5 @@ export interface CustomizationContextType {
   ) => void;
   getAvailableColors: () => ColorOption[];
   resetPartColor: () => void;
+  setIsHighlighting: (value: boolean) => void;
 }

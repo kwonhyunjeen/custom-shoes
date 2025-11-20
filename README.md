@@ -109,7 +109,7 @@ supabase functions serve  # Serve edge functions locally
 - ✅ Smooth camera controls and animations
 - ✅ Part-specific color rules and validation
 - ✅ Responsive UI with accessibility features
-- ✅ Advanced state management and context system
+- ✅ Advanced state management
 
 **🚧 Future Enhancements**
 
@@ -126,7 +126,6 @@ custom-shoes/
 │   │   ├── components/     # React components
 │   │   │   ├── customization/  # 3D customization components
 │   │   │   └── ui/            # Reusable UI components
-│   │   ├── contexts/       # React context providers
 │   │   ├── data/          # Static data and configurations
 │   │   ├── types/         # TypeScript type definitions
 │   │   └── utils/         # Utility functions
