@@ -24,9 +24,10 @@
     "leva": "^0.10.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "tailwindcss": "^4.1.11",
     "tailwind-merge": "^3.3.1",
-    "three": "^0.177.0"
+    "tailwindcss": "^4.1.11",
+    "three": "^0.177.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

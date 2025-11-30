@@ -9,6 +9,12 @@ import {
   Color,
 } from "three";
 
+const VALID_SHOE_PART_IDS = SHOE_PARTS.map((part) => part.id);
+
+export const getValidShoePartIds = (): ShoePart["id"][] => {
+  return VALID_SHOE_PART_IDS;
+};
+
 // 파트 ID -> Mesh 이름으로 변환
 export const convertPartIdToMeshNames = (partId: ShoePart["id"]): string[] => {
   const pascalCasePartName = partId
@@ -33,7 +39,7 @@ export const getPartIdFromMeshName = (
     .replace(/_+/g, "_");
 
   // 파트 검증
-  const validPartIds = SHOE_PARTS.map((part) => part.id);
+  const validPartIds = getValidShoePartIds();
   if (validPartIds.includes(snakeCaseName as ShoePart["id"])) {
     return snakeCaseName as ShoePart["id"];
   }

@@ -4,13 +4,19 @@ import { CameraControls } from "@react-three/drei";
 import { Mesh, BufferGeometry, Material, Color } from "three";
 
 import { useRef, useEffect } from "react";
-import type { ShoePart } from "@/types/customization";
-import { useCustomization } from "@/contexts/CustomizationContext";
+import type { ColorOption, ShoePart } from "@/types/customization";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
 import { PART_CAMERA_ANGLES } from "@/data/cameraAngles";
 import { applyColorToMeshes, findPartMeshes } from "@/utils/mesh";
 import { sphericalToCartesian } from "@/utils/geometry";
 import { useShoeInteraction } from "@/hooks/useShoeInteraction";
+
+interface ShoesProps {
+  shoesColors: Record<ShoePart["id"], ColorOption["id"]>;
+  currentPart: ShoePart;
+  onPartSelect?: (partId: ShoePart["id"]) => void;
+  onHighlightingChange?: (isHighlighting: boolean) => void;
+}
 
 const ANIMATION_CONFIG = {
   TOTAL_DURATION: 1000,
@@ -122,12 +128,18 @@ const animateCameraToPart = (
     );
 };
 
-export const Shoes = () => {
+const defaultOnPartSelect = () => {};
+
+export const Shoes = ({
+  shoesColors,
+  currentPart,
+  onPartSelect,
+  onHighlightingChange,
+}: ShoesProps) => {
   const gltf = useLoader(GLTFLoader, "/models/custom.glb");
 
-  const { shoesColors, currentPart, selectPart } = useCustomization();
   const { handlePointerDown, handlePointerMove, handlePointerUp } =
-    useShoeInteraction({ onPartSelect: selectPart });
+    useShoeInteraction({ onPartSelect: onPartSelect ?? defaultOnPartSelect });
 
   const cameraControlsRef = useRef<CameraControls>(null);
   const previousPartRef = useRef<ShoePart["id"] | null>(null);
@@ -172,7 +184,10 @@ export const Shoes = () => {
         );
         const originalColor = colorOption?.color || "#FFFFFF";
 
-        highlightPartMeshes(meshes, originalColor);
+        onHighlightingChange?.(true);
+        highlightPartMeshes(meshes, originalColor, () => {
+          onHighlightingChange?.(false);
+        });
       }
 
       if (cameraControlsRef.current) {
@@ -181,7 +196,7 @@ export const Shoes = () => {
 
       previousPartRef.current = currentPartId;
     }
-  }, [currentPart, gltf.scene, shoesColors]);
+  }, [currentPart, gltf.scene, shoesColors, onHighlightingChange]);
 
   useEffect(() => {
     if (cameraControlsRef.current) {
