@@ -40,7 +40,7 @@ export const Generator = ({ changePartColors }: GeneratorProps) => {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:54321/functions/v1/generate-shoes-color",
+        `${import.meta.env.VITE_API_ORIGIN}/generate-shoes-color`,
         {
           method: "POST",
           mode: "cors",

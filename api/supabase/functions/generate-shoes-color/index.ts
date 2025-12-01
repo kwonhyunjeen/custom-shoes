@@ -17,13 +17,6 @@ import z from "zod";
 const MODE = Deno.env.get("MODE");
 const CEREBRAS_API_KEY = Deno.env.get("CEREBRAS_API_KEY");
 
-// TODO: production Origin 설정
-const corsHeaders = {
-  "Access-Control-Allow-Origin": MODE === "production" ? "http://TODO" : "*",
-  "Access-Control-Allow-Headers": "content-type",
-  "Access-Control-Allow-Methods": "OPTIONS, POST",
-};
-
 const outputSchema = z
   .object({
     collar: z.union([
@@ -213,45 +206,68 @@ const outputDescription = `
 `.trim();
 
 Deno.serve(async (req) => {
+  const origin = req.headers.get("Origin") ?? "";
+  const allowOrigin = (() => {
+    if (MODE !== "production") {
+      return "*";
+    }
+
+    const staticOrigins = ["https://customshoes.kwonhyunjin.com"];
+    const dynamicOriginRegExp =
+      /^https:\/\/custom-shoes-.*-hyunjin-kwons-projects-41d115e4\.vercel\.app$/; // Staging URL wildcard pattern check
+
+    if (staticOrigins.includes(origin) || dynamicOriginRegExp.test(origin)) {
+      return origin;
+    }
+
+    return "null";
+  })();
+
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers": "content-type",
+    "Access-Control-Allow-Methods": "OPTIONS, POST",
+  };
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  const { message } = await req.json();
+  try {
+    const { message } = await req.json();
 
-  if (!CEREBRAS_API_KEY) {
-    return new Response(
-      JSON.stringify({ error: "CEREBRAS_API_KEY is not set" }),
-      {
-        status: 500,
+    if (!CEREBRAS_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "CEREBRAS_API_KEY is not set" }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    if (!message) {
+      return new Response(JSON.stringify({ error: "Message is required" }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
-    );
-  }
+      });
+    }
 
-  if (!message) {
-    return new Response(JSON.stringify({ error: "Message is required" }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    const llm = new ChatCerebras({
+      apiKey: CEREBRAS_API_KEY,
+      model: "gpt-oss-120b",
+      maxTokens: 2048,
+      temperature: 0.3,
     });
-  }
 
-  const llm = new ChatCerebras({
-    apiKey: CEREBRAS_API_KEY,
-    model: "gpt-oss-120b",
-    maxTokens: 2048,
-    temperature: 0.3,
-  });
+    const variableParser = {
+      outputDescription: () => outputDescription,
+      formatInstructions: () => formatInstructions,
+      message: (input: { message: string }) => input.message,
+    };
 
-  const variableParser = {
-    outputDescription: () => outputDescription,
-    formatInstructions: () => formatInstructions,
-    message: (input: { message: string }) => input.message,
-  };
-
-  const promptTemplate = ChatPromptTemplate.fromMessages([
-    SystemMessagePromptTemplate.fromTemplate(
-      `
+    const promptTemplate = ChatPromptTemplate.fromMessages([
+      SystemMessagePromptTemplate.fromTemplate(
+        `
 You are a helpful assistant that generates shoe color combinations.
 
 Analyze the user's request and determine if they want:
@@ -266,27 +282,37 @@ Analyze the user's request and determine if they want:
 ## Format Instructions
 {{formatInstructions}}
 `.trim(),
-      { templateFormat: "mustache" },
-    ),
-    HumanMessagePromptTemplate.fromTemplate("{{message}}", {
-      templateFormat: "mustache",
-    }),
-  ]);
+        { templateFormat: "mustache" },
+      ),
+      HumanMessagePromptTemplate.fromTemplate("{{message}}", {
+        templateFormat: "mustache",
+      }),
+    ]);
 
-  const runnable = RunnableSequence.from([
-    variableParser,
-    promptTemplate,
-    llm,
-    outputParser,
-  ]);
+    const runnable = RunnableSequence.from([
+      variableParser,
+      promptTemplate,
+      llm,
+      outputParser,
+    ]);
 
-  const output = await runnable.invoke({ message });
+    const output = await runnable.invoke({ message });
 
-  // console.debug("Output:", output);
-
-  return new Response(JSON.stringify(output), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
+    return new Response(JSON.stringify(output), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error processing request:", error);
+    return new Response(
+      JSON.stringify({
+        error: error instanceof Error ? error.message : "Internal Server Error",
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
 });
 
 /* To invoke locally:

@@ -28,6 +28,9 @@ dist-ssr
 .branches
 .temp
 
+# Vercel
+.vercel
+
 # dotenv
 .env
 .env.*

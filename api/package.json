@@ -12,7 +12,9 @@
     "docker:start": "supabase start",
     "docker:stop": "supabase stop",
     "docker:status": "supabase status",
-    "dev": "supabase functions --env-file .env serve --no-verify-jwt"
+    "dev": "supabase functions serve --env-file .env --no-verify-jwt",
+    "ship": "supabase functions deploy generate-shoes-color --no-verify-jwt",
+    "secrets": "supabase secrets set --env-file .env.production"
   },
   "devDependencies": {
     "supabase": "^2.31.4"
