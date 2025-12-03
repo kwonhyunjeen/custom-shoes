@@ -2,6 +2,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { useLoader } from "@react-three/fiber";
 import { CameraControls } from "@react-three/drei";
 import { Mesh, BufferGeometry, Material, Color } from "three";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 import { useRef, useEffect } from "react";
 import type { ColorOption, ShoePart } from "@/types/customization";
@@ -136,7 +137,17 @@ export const Shoes = ({
   onPartSelect,
   onHighlightingChange,
 }: ShoesProps) => {
-  const gltf = useLoader(GLTFLoader, "/models/custom.glb");
+  const gltf = useLoader(
+    GLTFLoader,
+    "/models/custom.compressed.glb",
+    (loader) => {
+      const dracoLoader = new DRACOLoader();
+      dracoLoader.setDecoderPath(
+        "https://www.gstatic.com/draco/versioned/decoders/1.5.7/",
+      );
+      loader.setDRACOLoader(dracoLoader);
+    },
+  );
 
   const { handlePointerDown, handlePointerMove, handlePointerUp } =
     useShoeInteraction({ onPartSelect: onPartSelect ?? defaultOnPartSelect });
