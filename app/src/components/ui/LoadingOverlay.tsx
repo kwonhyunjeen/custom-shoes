@@ -1,7 +1,7 @@
 export const LoadingOverlay = () => {
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center pointer-events-auto z-50"
+      className="w-full h-full flex items-center justify-center pointer-events-auto"
       role="status"
       aria-live="polite"
       aria-label="Loading..."
