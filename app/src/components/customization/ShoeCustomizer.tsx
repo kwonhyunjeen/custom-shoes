@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, useState } from "react";
 import { Scene } from "./Scene";
+import { LoadingOverlay } from "../ui/LoadingOverlay";
 import { Generator } from "./Generator";
 import { Panel } from "./Panel";
 import { Shoes } from "./Shoes";
@@ -116,14 +117,16 @@ export const ShoeCustomizer = () => {
 
   return (
     <div className="h-screen relative">
-      <Scene isPanelCollapsed={isPanelCollapsed}>
-        <Shoes
-          shoesColors={shoesColors}
-          currentPart={currentPart}
-          onPartSelect={selectPart}
-          onHighlightingChange={setIsHighlighting}
-        />
-      </Scene>
+      <Suspense fallback={<LoadingOverlay />}>
+        <Scene isPanelCollapsed={isPanelCollapsed}>
+          <Shoes
+            shoesColors={shoesColors}
+            currentPart={currentPart}
+            onPartSelect={selectPart}
+            onHighlightingChange={setIsHighlighting}
+          />
+        </Scene>
+      </Suspense>
       <Panel
         isCollapsed={isPanelCollapsed}
         onCollapseChange={setIsPanelCollapsed}
