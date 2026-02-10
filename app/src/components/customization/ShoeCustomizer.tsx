@@ -1,8 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, useState } from "react";
 import { Scene } from "./Scene";
+import { LoadingOverlay } from "../ui/LoadingOverlay";
 import { Generator } from "./Generator";
 import { Panel } from "./Panel";
 import { Shoes } from "./Shoes";
+import { Html } from "@react-three/drei";
 import type { ColorOption, ShoePart } from "@/types/customization";
 import { SHOE_PARTS } from "@/data/shoeParts";
 import { COLOR_OPTIONS } from "@/data/colorOptions";
@@ -117,12 +119,20 @@ export const ShoeCustomizer = () => {
   return (
     <div className="h-screen relative">
       <Scene isPanelCollapsed={isPanelCollapsed}>
-        <Shoes
-          shoesColors={shoesColors}
-          currentPart={currentPart}
-          onPartSelect={selectPart}
-          onHighlightingChange={setIsHighlighting}
-        />
+        <Suspense
+          fallback={
+            <Html fullscreen>
+              <LoadingOverlay />
+            </Html>
+          }
+        >
+          <Shoes
+            shoesColors={shoesColors}
+            currentPart={currentPart}
+            onPartSelect={selectPart}
+            onHighlightingChange={setIsHighlighting}
+          />
+        </Suspense>
       </Scene>
       <Panel
         isCollapsed={isPanelCollapsed}
