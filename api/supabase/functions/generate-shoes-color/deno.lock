@@ -2,9 +2,12 @@
   "version": "5",
   "specifiers": {
     "jsr:@supabase/functions-js@*": "2.101.1",
+    "npm:@langchain/cerebras@*": "1.0.4_@langchain+core@1.1.39__openai@4.104.0___zod@4.0.5__zod@4.0.5_openai@4.104.0__zod@4.0.5",
     "npm:@langchain/cerebras@1.0.4": "1.0.4_@langchain+core@1.1.39__openai@4.104.0___zod@4.0.5__zod@4.0.5_openai@4.104.0__zod@4.0.5",
+    "npm:@langchain/core@*": "1.1.39_openai@4.104.0__zod@4.0.5_zod@4.0.5",
     "npm:@langchain/core@1.1.39": "1.1.39_openai@4.104.0__zod@4.0.5_zod@4.0.5",
     "npm:openai@^4.52.5": "4.104.0_zod@4.0.5",
+    "npm:zod@*": "4.0.5",
     "npm:zod@4.0.5": "4.0.5",
     "npm:zod@^4.0.5": "4.0.5"
   },

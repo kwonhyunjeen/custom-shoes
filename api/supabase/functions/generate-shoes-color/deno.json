@@ -6,5 +6,10 @@
     "@langchain/core/prompts": "npm:@langchain/core@1.1.39/prompts",
     "@langchain/core/runnables": "npm:@langchain/core@1.1.39/runnables",
     "zod": "npm:zod@^4.0.5"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-import-prefix"]
+    }
   }
 }

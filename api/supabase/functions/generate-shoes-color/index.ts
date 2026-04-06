@@ -4,15 +4,15 @@
 
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { ChatCerebras } from "@langchain/cerebras";
-import { StructuredOutputParser } from "@langchain/core/output_parsers";
+import { ChatCerebras } from "npm:@langchain/cerebras";
+import { StructuredOutputParser } from "npm:@langchain/core/output_parsers";
 import {
   ChatPromptTemplate,
   HumanMessagePromptTemplate,
   SystemMessagePromptTemplate,
-} from "@langchain/core/prompts";
-import { RunnableSequence } from "@langchain/core/runnables";
-import z from "zod";
+} from "npm:@langchain/core/prompts";
+import { RunnableSequence } from "npm:@langchain/core/runnables";
+import z from "npm:zod";
 
 const MODE = Deno.env.get("MODE");
 const CEREBRAS_API_KEY = Deno.env.get("CEREBRAS_API_KEY");
