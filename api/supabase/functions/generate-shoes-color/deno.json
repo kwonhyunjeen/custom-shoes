@@ -1,10 +1,10 @@
 {
   "imports": {
-    "@langchain/cerebras": "npm:@langchain/cerebras@1.0.4",
     "@langchain/core": "npm:@langchain/core@1.1.39",
     "@langchain/core/output_parsers": "npm:@langchain/core@1.1.39/output_parsers",
     "@langchain/core/prompts": "npm:@langchain/core@1.1.39/prompts",
     "@langchain/core/runnables": "npm:@langchain/core@1.1.39/runnables",
+    "@langchain/groq": "npm:@langchain/groq@1.2.0",
     "zod": "npm:zod@^4.0.5"
   },
   "lint": {

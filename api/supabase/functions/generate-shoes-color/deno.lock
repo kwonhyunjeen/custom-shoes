@@ -2,10 +2,8 @@
   "version": "5",
   "specifiers": {
     "jsr:@supabase/functions-js@*": "2.101.1",
-    "npm:@langchain/cerebras@*": "1.0.4_@langchain+core@1.1.39__openai@4.104.0___zod@4.0.5__zod@4.0.5_openai@4.104.0__zod@4.0.5",
-    "npm:@langchain/cerebras@1.0.4": "1.0.4_@langchain+core@1.1.39__openai@4.104.0___zod@4.0.5__zod@4.0.5_openai@4.104.0__zod@4.0.5",
     "npm:@langchain/core@*": "1.1.39_openai@4.104.0__zod@4.0.5_zod@4.0.5",
-    "npm:@langchain/core@1.1.39": "1.1.39_openai@4.104.0__zod@4.0.5_zod@4.0.5",
+    "npm:@langchain/groq@*": "1.2.0_@langchain+core@1.1.39__openai@4.104.0___zod@4.0.5__zod@4.0.5_openai@4.104.0__zod@4.0.5",
     "npm:openai@^4.52.5": "4.104.0_zod@4.0.5",
     "npm:zod@*": "4.0.5",
     "npm:zod@4.0.5": "4.0.5",
@@ -20,28 +18,8 @@
     }
   },
   "npm": {
-    "@cerebras/cerebras_cloud_sdk@1.64.1": {
-      "integrity": "sha512-eQ0udGHS9xrWANi56yCS/FMcbwtysugD73YWipp89+zarbm2pd5hxqrmGlFqafS4Pwyo7cU7Qv31am5jdjqXFg==",
-      "dependencies": [
-        "@types/node@18.19.130",
-        "@types/node-fetch",
-        "abort-controller",
-        "agentkeepalive",
-        "form-data-encoder",
-        "formdata-node",
-        "node-fetch"
-      ]
-    },
     "@cfworker/json-schema@4.1.1": {
       "integrity": "sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og=="
-    },
-    "@langchain/cerebras@1.0.4_@langchain+core@1.1.39__openai@4.104.0___zod@4.0.5__zod@4.0.5_openai@4.104.0__zod@4.0.5": {
-      "integrity": "sha512-awbo4vXvkzEj1jhllrj17XrA20uT2AEYND1c3MYypxx85CKxksVx2geXxj1K3wiHJ/tPWVVpKC9wHfuwo2LE/Q==",
-      "dependencies": [
-        "@cerebras/cerebras_cloud_sdk",
-        "@langchain/core",
-        "uuid@10.0.0"
-      ]
     },
     "@langchain/core@1.1.39_openai@4.104.0__zod@4.0.5_zod@4.0.5": {
       "integrity": "sha512-DP9c7TREy6iA7HnywstmUAsNyJNYTFpRg2yBfQ+6H0l1HnvQzei9GsQ36GeOLxgRaD3vm9K8urCcawSC7yQpCw==",
@@ -57,6 +35,13 @@
         "p-queue",
         "uuid@11.1.0",
         "zod"
+      ]
+    },
+    "@langchain/groq@1.2.0_@langchain+core@1.1.39__openai@4.104.0___zod@4.0.5__zod@4.0.5_openai@4.104.0__zod@4.0.5": {
+      "integrity": "sha512-OozhcAUNDT4XmvQmzd1+TFinyDCZVU/4WjmjEEOO09aVhG7hBbJuodhF/fuajH52JsdFclBCnYomulA+iqe+1w==",
+      "dependencies": [
+        "@langchain/core",
+        "groq-sdk"
       ]
     },
     "@standard-schema/spec@1.1.0": {
@@ -216,6 +201,10 @@
     "gopd@1.2.0": {
       "integrity": "sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg=="
     },
+    "groq-sdk@1.1.2": {
+      "integrity": "sha512-CZO0XUQQDhn43ri1+lZHxZKpb+bGutgTvFmCJtooexiitGmPqhm1hntOT3nCoaq07e+OpeokVnfUs0i/oQuUaQ==",
+      "bin": true
+    },
     "has-symbols@1.1.0": {
       "integrity": "sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ=="
     },
@@ -362,8 +351,8 @@
   },
   "workspace": {
     "dependencies": [
-      "npm:@langchain/cerebras@1.0.4",
       "npm:@langchain/core@1.1.39",
+      "npm:@langchain/groq@1.2.0",
       "npm:zod@^4.0.5"
     ]
   }

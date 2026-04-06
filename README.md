@@ -16,7 +16,7 @@ A web application that combines 3D visualization with AI-powered natural languag
 **🤖 AI-Powered Natural Language Interface**
 
 - Natural language color commands (e.g., "Make the laces look summery!")
-- Powered by Cerebras LLM through Supabase Edge Functions
+- Powered by Groq LLM through Supabase Edge Functions
 - Intelligent color interpretation and application
 - Seamless integration with manual customization
 
@@ -39,7 +39,7 @@ A web application that combines 3D visualization with AI-powered natural languag
 - **Frontend:** React 19 + TypeScript + Vite
 - **3D Graphics:** Three.js + React Three Fiber + React Three Drei
 - **Styling:** Tailwind CSS v4 with custom design system
-- **AI Backend:** Supabase Edge Functions + Cerebras LLM
+- **AI Backend:** Supabase Edge Functions + Groq LLM
 - **State Management:** React Context + Custom hooks
 - **Development:** ESLint + Prettier + Lefthook
 
@@ -147,7 +147,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **React Three Fiber community** for excellent documentation and examples
 - **Three.js ecosystem** for powerful 3D capabilities and extensive community
 - **Supabase** for seamless backend infrastructure
-- **Cerebras** for fast and efficient AI model inference
+- **Groq** for fast and efficient AI model inference
 
 ---
 

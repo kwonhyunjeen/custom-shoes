@@ -4,7 +4,7 @@
 
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { ChatCerebras } from "npm:@langchain/cerebras";
+import { ChatGroq } from "npm:@langchain/groq";
 import { StructuredOutputParser } from "npm:@langchain/core/output_parsers";
 import {
   ChatPromptTemplate,
@@ -15,7 +15,7 @@ import { RunnableSequence } from "npm:@langchain/core/runnables";
 import z from "npm:zod";
 
 const MODE = Deno.env.get("MODE");
-const CEREBRAS_API_KEY = Deno.env.get("CEREBRAS_API_KEY");
+const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
 
 const outputSchema = z
   .object({
@@ -235,9 +235,9 @@ Deno.serve(async (req) => {
   try {
     const { message } = await req.json();
 
-    if (!CEREBRAS_API_KEY) {
+    if (!GROQ_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "CEREBRAS_API_KEY is not set" }),
+        JSON.stringify({ error: "GROQ_API_KEY is not set" }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -252,9 +252,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    const llm = new ChatCerebras({
-      apiKey: CEREBRAS_API_KEY,
-      model: "gpt-oss-120b",
+    const llm = new ChatGroq({
+      apiKey: GROQ_API_KEY,
+      model: "openai/gpt-oss-120b",
       maxTokens: 2048,
       temperature: 0.3,
     });
