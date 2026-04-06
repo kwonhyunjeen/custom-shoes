@@ -17,6 +17,6 @@
     "secrets": "supabase secrets set --env-file .env.production"
   },
   "devDependencies": {
-    "supabase": "^2.31.4"
+    "supabase": "^2.66.1"
   }
 }
